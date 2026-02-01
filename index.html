@@ -3,1173 +3,776 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Academy Overgewicht — Trainingsschema Generator</title>
+<title>Academie over Gewicht — Trainingsschema Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --black: #0a0a0a;
-    --white: #f5f5f0;
-    --gold: #c9a84c;
-    --gold-light: #e2c97e;
-    --gold-dim: rgba(201,168,76,0.15);
-    --gray: #6b6b6b;
-    --gray-light: #a0a0a0;
-    --card-bg: #141414;
-    --border: rgba(201,168,76,0.25);
-  }
-
-  * { margin:0; padding:0; box-sizing:border-box; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--black);
-    color: var(--white);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ─── BACKGROUND TEXTURE ─── */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background: 
-      radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.04) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, rgba(201,168,76,0.03) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* ─── QUIZ SCREEN ─── */
-  .screen { display:none; min-height:100vh; position:relative; z-index:1; }
-  .screen.active { display:flex; flex-direction:column; }
-
-  #quiz-screen {
-    justify-content: center;
-    align-items: center;
-    padding: 40px 20px;
-  }
-
-  .quiz-container {
-    width: 100%;
-    max-width: 600px;
-  }
-
-  .quiz-header {
-    text-align: center;
-    margin-bottom: 48px;
-  }
-
-  .quiz-header .brand {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 16px;
-  }
-
-  .quiz-header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 42px;
-    font-weight: 900;
-    line-height: 1.1;
-    color: var(--white);
-  }
-
-  .quiz-header h1 span { color: var(--gold); }
-
-  .quiz-header p {
-    margin-top: 12px;
-    color: var(--gray-light);
-    font-size: 15px;
-    font-weight: 300;
-  }
-
-  /* Progress bar */
-  .progress-track {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 40px;
-  }
-
-  .progress-dot {
-    height: 3px;
-    flex: 1;
-    background: rgba(255,255,255,0.1);
-    border-radius: 2px;
-    transition: background 0.4s ease;
-  }
-  .progress-dot.filled { background: var(--gold); }
-
-  /* Question */
-  .question-block { display:none; }
-  .question-block.active { display:block; animation: fadeUp 0.4s ease; }
-
-  @keyframes fadeUp {
-    from { opacity:0; transform: translateY(12px); }
-    to { opacity:1; transform: translateY(0); }
-  }
-
-  .question-label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 10px;
-  }
-
-  .question-text {
-    font-family: 'Playfair Display', serif;
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 28px;
-    color: var(--white);
-  }
-
-  /* Option cards */
-  .options { display:flex; flex-direction:column; gap:10px; }
-
-  .option {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px 20px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--card-bg);
-    cursor: pointer;
-    transition: all 0.25s ease;
-    user-select: none;
-  }
-
-  .option:hover {
-    border-color: var(--gold);
-    background: rgba(201,168,76,0.06);
-  }
-
-  .option.selected {
-    border-color: var(--gold);
-    background: var(--gold-dim);
-    box-shadow: 0 0 0 1px var(--gold);
-  }
-
-  .option-icon {
-    font-size: 20px;
-    width: 28px;
-    text-align: center;
-    flex-shrink: 0;
-  }
-
-  .option-text {
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--white);
-  }
-
-  .option-sub {
-    font-size: 12px;
-    color: var(--gray-light);
-    font-weight: 300;
-    margin-top: 2px;
-  }
-
-  /* Nav buttons */
-  .quiz-nav {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 36px;
-  }
-
-  .btn {
-    padding: 14px 32px;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    cursor: pointer;
-    border: none;
-    transition: all 0.25s ease;
-  }
-
-  .btn-back {
-    background: transparent;
-    color: var(--gray-light);
-    border: 1px solid rgba(255,255,255,0.1);
-  }
-  .btn-back:hover { border-color: var(--gold); color: var(--gold); }
-
-  .btn-next {
-    background: var(--gold);
-    color: var(--black);
-  }
-  .btn-next:hover { background: var(--gold-light); }
-  .btn-next:disabled { opacity: 0.3; cursor: not-allowed; }
-
-  .btn-generate {
-    background: var(--gold);
-    color: var(--black);
-    padding: 16px 48px;
-    font-size: 15px;
-  }
-  .btn-generate:hover { background: var(--gold-light); }
-
-  /* ─── RESULT SCREEN ─── */
-  #result-screen {
-    padding: 0;
-    justify-content: flex-start;
-  }
-
-  .result-header {
-    background: var(--black);
-    border-bottom: 1px solid var(--border);
-    padding: 24px 32px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-
-  .result-header .brand-small {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--gold);
-  }
-
-  .result-header .actions { display:flex; gap:12px; }
-
-  .btn-pdf {
-    background: var(--gold);
-    color: var(--black);
-    padding: 10px 24px;
-    border-radius: 6px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
-  }
-  .btn-pdf:hover { background: var(--gold-light); }
-
-  .btn-restart {
-    background: transparent;
-    color: var(--gray-light);
-    padding: 10px 24px;
-    border-radius: 6px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: all 0.2s;
-  }
-  .btn-restart:hover { border-color: var(--gold); color: var(--gold); }
-
-  /* Result content */
-  .result-content {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 48px 24px 80px;
-  }
-
-  .result-title-block {
-    text-align: center;
-    margin-bottom: 48px;
-    padding-bottom: 40px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .result-title-block .brand {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 12px;
-  }
-
-  .result-title-block h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 36px;
-    font-weight: 900;
-    color: var(--white);
-    margin-bottom: 8px;
-  }
-
-  .result-title-block .tags {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .tag {
-    background: var(--gold-dim);
-    border: 1px solid var(--border);
-    color: var(--gold);
-    padding: 5px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-  }
-
-  /* Sections */
-  .section { margin-bottom: 48px; }
-
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--white);
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .section-title .icon { color: var(--gold); }
-
-  .section-divider {
-    height: 2px;
-    background: linear-gradient(90deg, var(--gold), transparent);
-    margin-bottom: 24px;
-    border-radius: 1px;
-  }
-
-  /* Overload blocks */
-  .overload-text {
-    color: var(--gray-light);
-    font-size: 14px;
-    line-height: 1.7;
-    font-weight: 300;
-    margin-bottom: 24px;
-  }
-
-  .blok-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
-
-  .blok-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px 14px;
-    text-align: center;
-  }
-
-  .blok-card .blok-name {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 4px;
-  }
-
-  .blok-card .blok-weeks {
-    font-size: 11px;
-    color: var(--gray);
-    margin-bottom: 10px;
-  }
-
-  .blok-card .blok-action {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--white);
-  }
-
-  /* Schema tables */
-  .schema-block { margin-bottom: 36px; }
-
-  .schema-block-title {
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .schema-block-title .week-badge {
-    background: var(--gold-dim);
-    border: 1px solid var(--border);
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    color: var(--gold-light);
-  }
-
-  .schema-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
-
-  .schema-table th {
-    background: rgba(201,168,76,0.08);
-    color: var(--gold);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 12px 14px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .schema-table td {
-    padding: 11px 14px;
-    font-size: 13px;
-    color: var(--white);
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    font-weight: 400;
-  }
-
-  .schema-table tr:last-child td { border-bottom: none; }
-
-  .schema-table tr:hover td { background: rgba(201,168,76,0.03); }
-
-  .schema-table .day-cell {
-    font-weight: 600;
-    color: var(--gold-light);
-    font-size: 12px;
-    white-space: nowrap;
-  }
-
-  .schema-table .note-cell {
-    color: var(--gray-light);
-    font-size: 12px;
-    font-style: italic;
-  }
-
-  /* Warmup table */
-  .warmup-row {
-    display: grid;
-    grid-template-columns: 100px 1fr;
-    gap: 0;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-
-  .warmup-phase {
-    background: var(--card-bg);
-    padding: 20px 16px;
-    border-right: 1px solid var(--border);
-  }
-
-  .warmup-phase .phase-name {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 4px;
-  }
-
-  .warmup-phase .phase-dur {
-    font-size: 12px;
-    color: var(--gray-light);
-  }
-
-  .warmup-activities {
-    padding: 20px 18px;
-    font-size: 13px;
-    color: var(--gray-light);
-    line-height: 1.8;
-  }
-
-  /* Nutrition */
-  .nutrition-box {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 24px;
-    font-size: 14px;
-    color: var(--gray-light);
-    line-height: 1.8;
-    font-weight: 300;
-  }
-
-  /* Loading overlay */
-  .loading-overlay {
-    display:none;
-    position:fixed; inset:0;
-    background: rgba(10,10,10,0.85);
-    z-index:100;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    gap:16px;
-  }
-  .loading-overlay.active { display:flex; }
-
-  .loader {
-    width:40px; height:40px;
-    border: 2px solid var(--border);
-    border-top-color: var(--gold);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-  }
-  @keyframes spin { to { transform:rotate(360deg); } }
-
-  .loading-overlay p {
-    color: var(--gray-light);
-    font-size: 14px;
-    font-weight: 300;
-  }
-
-  /* ─── PRINT / PDF STYLES ─── */
-  @media print {
-    body { background: #fff; color: #111; }
-    body::before { display:none; }
-    .result-header { display:none; }
-    .screen:not(#result-screen) { display:none !important; }
-    #result-screen { display:flex !important; }
-    .result-content { padding: 0; max-width:100%; }
-
-    .result-title-block {
-      border-bottom: 2px solid #c9a84c;
-      padding-bottom: 24px;
-      margin-bottom: 32px;
-    }
-
-    .result-title-block .brand { color: #c9a84c; }
-    .result-title-block h2 { color: #111; font-size:28px; }
-    .tag { background: #faf3e0; border-color:#c9a84c; color:#c9a84c; }
-    .section-title { color: #111; }
-    .section-title .icon { color: #c9a84c; }
-    .section-divider { background: linear-gradient(90deg, #c9a84c, transparent); }
-    .overload-text { color: #555; }
-
-    .blok-card { border-color:#ddd; background:#fafafa; }
-    .blok-card .blok-name { color:#c9a84c; }
-    .blok-card .blok-weeks { color:#999; }
-    .blok-card .blok-action { color:#111; }
-
-    .schema-block-title { color:#c9a84c; }
-    .schema-block-title .week-badge { background:#faf3e0; border-color:#c9a84c; color:#b8943e; }
-
-    .schema-table { border-color:#ddd; }
-    .schema-table th { background:#faf3e0; color:#c9a84c; border-bottom-color:#ddd; }
-    .schema-table td { color:#222; border-bottom-color:#eee; }
-    .schema-table .day-cell { color:#c9a84c; }
-    .schema-table .note-cell { color:#888; }
-    .schema-table tr:hover td { background:transparent; }
-
-    .warmup-row { border-color:#ddd; }
-    .warmup-phase { background:#fafafa; border-right-color:#ddd; }
-    .warmup-phase .phase-name { color:#c9a84c; }
-    .warmup-phase .phase-dur { color:#999; }
-    .warmup-activities { color:#555; }
-
-    .nutrition-box { background:#fafafa; border-color:#ddd; color:#555; }
-
-    .schema-block { page-break-inside: avoid; }
-  }
-
-  @media (max-width: 600px) {
-    .quiz-header h1 { font-size: 30px; }
-    .blok-row { grid-template-columns: repeat(2,1fr); }
-    .result-content { padding: 32px 16px 60px; }
-    .result-header { padding: 16px; flex-wrap:wrap; gap:8px; }
-  }
+:root{--black:#0a0a0a;--white:#f5f5f0;--gold:#c9a84c;--gold-light:#e2c97e;--gold-dim:rgba(201,168,76,0.15);--gray:#6b6b6b;--gray-light:#a0a0a0;--card-bg:#141414;--border:rgba(201,168,76,0.25)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--white);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(201,168,76,0.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(201,168,76,0.03) 0%,transparent 50%);pointer-events:none;z-index:0}
+
+.screen{display:none;min-height:100vh;position:relative;z-index:1}
+.screen.active{display:flex;flex-direction:column}
+#quiz-screen{justify-content:center;align-items:center;padding:40px 20px}
+.quiz-container{width:100%;max-width:600px}
+
+.quiz-header{text-align:center;margin-bottom:48px}
+.quiz-header .brand{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.quiz-header h1{font-family:'Playfair Display',serif;font-size:42px;font-weight:900;line-height:1.1;color:var(--white)}
+.quiz-header h1 span{color:var(--gold)}
+.quiz-header p{margin-top:12px;color:var(--gray-light);font-size:15px;font-weight:300}
+
+.progress-track{display:flex;gap:8px;margin-bottom:40px}
+.progress-dot{height:3px;flex:1;background:rgba(255,255,255,0.1);border-radius:2px;transition:background .4s}
+.progress-dot.filled{background:var(--gold)}
+
+.question-block{display:none}
+.question-block.active{display:block;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.question-label{font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.question-text{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:28px}
+
+.options{display:flex;flex-direction:column;gap:10px}
+.option{display:flex;align-items:center;gap:16px;padding:16px 20px;border:1px solid var(--border);border-radius:10px;background:var(--card-bg);cursor:pointer;transition:all .25s;user-select:none}
+.option:hover{border-color:var(--gold);background:rgba(201,168,76,0.06)}
+.option.selected{border-color:var(--gold);background:var(--gold-dim);box-shadow:0 0 0 1px var(--gold)}
+.option-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0}
+.option-text{font-size:15px;font-weight:500}
+.option-sub{font-size:12px;color:var(--gray-light);font-weight:300;margin-top:2px}
+
+.quiz-nav{display:flex;justify-content:space-between;margin-top:36px}
+.btn{padding:14px 32px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;transition:all .25s}
+.btn-back{background:transparent;color:var(--gray-light);border:1px solid rgba(255,255,255,0.1)}
+.btn-back:hover{border-color:var(--gold);color:var(--gold)}
+.btn-next{background:var(--gold);color:var(--black)}
+.btn-next:hover{background:var(--gold-light)}
+.btn-next:disabled{opacity:.3;cursor:not-allowed}
+
+#result-screen{padding:0;justify-content:flex-start}
+.result-header{background:var(--black);border-bottom:1px solid var(--border);padding:24px 32px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.result-header .brand-small{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+.result-header .actions{display:flex;gap:12px}
+.btn-pdf{background:var(--gold);color:var(--black);padding:10px 24px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.btn-pdf:hover{background:var(--gold-light)}
+.btn-restart{background:transparent;color:var(--gray-light);padding:10px 24px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:1px solid rgba(255,255,255,0.1);transition:all .2s}
+.btn-restart:hover{border-color:var(--gold);color:var(--gold)}
+
+.result-content{max-width:960px;margin:0 auto;padding:48px 24px 80px}
+.result-title-block{text-align:center;margin-bottom:48px;padding-bottom:40px;border-bottom:1px solid var(--border)}
+.result-title-block .brand{font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.result-title-block h2{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;margin-bottom:12px}
+.tags{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.tag{background:var(--gold-dim);border:1px solid var(--border);color:var(--gold);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500}
+
+.section{margin-bottom:48px}
+.section-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.section-title .icon{color:var(--gold)}
+.section-divider{height:2px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:24px;border-radius:1px}
+.overload-text{color:var(--gray-light);font-size:14px;line-height:1.7;font-weight:300;margin-bottom:24px}
+
+.blok-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.blok-card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:18px 14px;text-align:center}
+.blok-card .blok-name{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.blok-card .blok-weeks{font-size:11px;color:var(--gray);margin-bottom:10px}
+.blok-card .blok-action{font-size:13px;font-weight:500}
+
+.schema-block-title{font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.week-badge{background:var(--gold-dim);border:1px solid var(--border);padding:3px 10px;border-radius:12px;font-size:11px;color:var(--gold-light)}
+
+.schema-table{width:100%;border-collapse:collapse;border-radius:10px;overflow:hidden;border:1px solid var(--border);margin-bottom:20px}
+.schema-table th{background:rgba(201,168,76,0.08);color:var(--gold);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:10px 8px;text-align:left;border-bottom:1px solid var(--border)}
+.schema-table td{padding:9px 8px;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.schema-table tr:last-child td{border-bottom:none}
+.schema-table tr:hover td{background:rgba(201,168,76,0.03)}
+.w-cell{font-weight:600;color:var(--gold-light);font-size:11px;white-space:nowrap}
+.note-cell{color:var(--gray-light);font-size:11px;font-style:italic}
+.eq-badge{display:inline-block;font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:rgba(201,168,76,0.12);color:var(--gold);margin-left:3px}
+.ex-sep{background:rgba(201,168,76,0.05)}
+.ex-sep td{padding:4px 8px;font-size:9px;color:var(--gray);border-bottom:1px solid rgba(201,168,76,0.08)!important}
+
+.warmup-row{display:grid;grid-template-columns:110px 1fr;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.warmup-phase{background:var(--card-bg);padding:20px 16px;border-right:1px solid var(--border)}
+.warmup-phase .phase-name{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.warmup-phase .phase-dur{font-size:12px;color:var(--gray-light)}
+.warmup-activities{padding:20px 18px;font-size:13px;color:var(--gray-light);line-height:1.8}
+.nutrition-box{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:24px;font-size:14px;color:var(--gray-light);line-height:1.8;font-weight:300}
+
+/* Weight Log */
+.log-hint{font-size:13px;color:var(--gray-light);margin-bottom:20px;font-weight:300}
+.log-table{width:100%;border-collapse:collapse;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:28px}
+.log-table th{background:rgba(201,168,76,0.08);color:var(--gold);font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:8px 3px;text-align:center;border-bottom:1px solid var(--border);border-right:1px solid rgba(201,168,76,0.1)}
+.log-table th:first-child{text-align:left;padding-left:10px;width:180px}
+.log-table td{padding:7px 3px;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.04);border-right:1px solid rgba(255,255,255,0.04);text-align:center}
+.log-table td:first-child{text-align:left;padding-left:10px;font-weight:500;font-size:12px}
+.log-table tr:last-child td{border-bottom:none}
+.log-cell{min-height:26px;background:rgba(201,168,76,0.03)}
+.log-blok-header th{background:rgba(201,168,76,0.1)!important;color:var(--gold-light)!important;font-size:8px!important;letter-spacing:1px}
+
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(10,10,10,0.85);z-index:100;justify-content:center;align-items:center;flex-direction:column;gap:16px}
+.loading-overlay.active{display:flex}
+.loader{width:40px;height:40px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-overlay p{color:var(--gray-light);font-size:14px;font-weight:300}
+
+@media print{
+  body{background:#fff;color:#111}
+  body::before{display:none}
+  .result-header{display:none}
+  .screen:not(#result-screen){display:none!important}
+  #result-screen{display:flex!important}
+  .result-content{padding:0;max-width:100%}
+  .result-title-block{border-bottom:2px solid #c9a84c;padding-bottom:24px;margin-bottom:32px}
+  .result-title-block .brand{color:#c9a84c}
+  .result-title-block h2{color:#111;font-size:28px}
+  .tag{background:#faf3e0;border-color:#c9a84c;color:#c9a84c}
+  .section-title{color:#111}
+  .section-title .icon{color:#c9a84c}
+  .section-divider{background:linear-gradient(90deg,#c9a84c,transparent)}
+  .overload-text,.log-hint{color:#555}
+  .blok-card{border-color:#ddd;background:#fafafa}
+  .blok-card .blok-name{color:#c9a84c}
+  .blok-card .blok-weeks{color:#999}
+  .blok-card .blok-action{color:#111}
+  .schema-block-title{color:#c9a84c}
+  .week-badge{background:#faf3e0;border-color:#c9a84c;color:#b8943e}
+  .schema-table{border-color:#ddd}
+  .schema-table th{background:#faf3e0;color:#c9a84c;border-bottom-color:#ddd}
+  .schema-table td{color:#222;border-bottom-color:#eee}
+  .w-cell{color:#c9a84c}
+  .note-cell{color:#888}
+  .eq-badge{background:#faf3e0;color:#c9a84c}
+  .ex-sep{background:#f5f0e8!important}
+  .ex-sep td{color:#999!important;border-bottom-color:#e0d5c0!important}
+  .warmup-row{border-color:#ddd}
+  .warmup-phase{background:#fafafa;border-right-color:#ddd}
+  .warmup-phase .phase-name{color:#c9a84c}
+  .warmup-phase .phase-dur{color:#999}
+  .warmup-activities{color:#555}
+  .nutrition-box{background:#fafafa;border-color:#ddd;color:#555}
+  .log-table{border-color:#ddd}
+  .log-table th{background:#faf3e0;color:#c9a84c;border-right-color:#e0d5c0;border-bottom-color:#ddd}
+  .log-table td{color:#222;border-bottom-color:#eee;border-right-color:#eee}
+  .log-cell{background:#fff;border:1px solid #ccc}
+  .log-blok-header th{background:#f0e8d8!important;color:#c9a84c!important}
+  .schema-block{page-break-inside:avoid}
+  .log-section{page-break-before:always}
+}
+@media(max-width:600px){
+  .quiz-header h1{font-size:30px}
+  .blok-row{grid-template-columns:repeat(2,1fr)}
+  .result-content{padding:32px 16px 60px}
+  .result-header{padding:16px;flex-wrap:wrap;gap:8px}
+}
 </style>
 </head>
 <body>
 
-<!-- ═══════════ QUIZ SCREEN ═══════════ -->
+<!-- QUIZ -->
 <div id="quiz-screen" class="screen active">
-  <div class="quiz-container">
-    <div class="quiz-header">
-      <div class="brand">Academy Overgewicht</div>
-      <h1>Vind Jouw <span>Schema</span></h1>
-      <p>Beantwoord 4 vragen — we genereren je schema in seconden.</p>
-    </div>
+<div class="quiz-container">
+<div class="quiz-header">
+  <div class="brand">Academie over Gewicht</div>
+  <h1>Vind Jouw <span>Schema</span></h1>
+  <p>Beantwoord 4 vragen — we genereren je schema in seconden.</p>
+</div>
+<div class="progress-track">
+  <div class="progress-dot filled" id="dot-0"></div>
+  <div class="progress-dot" id="dot-1"></div>
+  <div class="progress-dot" id="dot-2"></div>
+  <div class="progress-dot" id="dot-3"></div>
+</div>
 
-    <div class="progress-track">
-      <div class="progress-dot filled" id="dot-0"></div>
-      <div class="progress-dot" id="dot-1"></div>
-      <div class="progress-dot" id="dot-2"></div>
-      <div class="progress-dot" id="dot-3"></div>
-    </div>
-
-    <!-- Q1: Frequentie -->
-    <div class="question-block active" id="q0">
-      <div class="question-label">Vraag 1 van 4</div>
-      <div class="question-text">Hoeveel keer per week kun je trainen?</div>
-      <div class="options" id="options-0">
-        <div class="option" data-q="0" data-val="2">
-          <div class="option-icon">📅</div>
-          <div><div class="option-text">2x per week</div><div class="option-sub">Ideaal voor herstel & basis opbouw</div></div>
-        </div>
-        <div class="option" data-q="0" data-val="3">
-          <div class="option-icon">📅</div>
-          <div><div class="option-text">3x per week</div><div class="option-sub">De meest populaire frequentie</div></div>
-        </div>
-        <div class="option" data-q="0" data-val="4">
-          <div class="option-icon">📅</div>
-          <div><div class="option-text">4x per week</div><div class="option-sub">Meer volume, meer resultaat</div></div>
-        </div>
-        <div class="option" data-q="0" data-val="5">
-          <div class="option-icon">📅</div>
-          <div><div class="option-text">5x per week</div><div class="option-sub">Full commitment</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Q2: Trainingsstijl -->
-    <div class="question-block" id="q1">
-      <div class="question-label">Vraag 2 van 4</div>
-      <div class="question-text">Welke trainingsstijl past best bij jou?</div>
-      <div class="options" id="options-1">
-        <div class="option" data-q="1" data-val="bbb">
-          <div class="option-icon">🍑</div>
-          <div><div class="option-text">BBB Focus</div><div class="option-sub">Glutes & Benen als hoofddoel</div></div>
-        </div>
-        <div class="option" data-q="1" data-val="fullbody">
-          <div class="option-icon">💪</div>
-          <div><div class="option-text">Fullbody</div><div class="option-sub">Alles in één training</div></div>
-        </div>
-        <div class="option" data-q="1" data-val="split">
-          <div class="option-icon">🔀</div>
-          <div><div class="option-text">Split Schema</div><div class="option-sub">Upper / Lower verdeling</div></div>
-        </div>
-        <div class="option" data-q="1" data-val="hybrid-strength">
-          <div class="option-icon">⚡</div>
-          <div><div class="option-text">Hybrid Strength</div><div class="option-sub">Kracht + Conditie combo</div></div>
-        </div>
-        <div class="option" data-q="1" data-val="hybrid-run">
-          <div class="option-icon">🏃</div>
-          <div><div class="option-text">Hybrid Run</div><div class="option-sub">Kracht + Hardlopen</div></div>
-        </div>
-        <div class="option" data-q="1" data-val="crossfit">
-          <div class="option-icon">🔥</div>
-          <div><div class="option-text">CrossFit / Circuit</div><div class="option-sub">High intensity, korte rust</div></div>
-        </div>
-        <div class="option" data-q="1" data-val="hyrox">
-          <div class="option-icon">🏅</div>
-          <div><div class="option-text">Hyrox</div><div class="option-sub">Functionele kracht + uithoudingsvermogen</div></div>
-        </div>
-        <div class="option" data-q="1" data-val="triathlon">
-          <div class="option-icon">🥇</div>
-          <div><div class="option-text">Triathlon</div><div class="option-sub">Zwimmen + Fietsen + Hardlopen</div></div>
-        </div>
-        <div class="option" data-q="1" data-val="gymrace">
-          <div class="option-icon">🏋️</div>
-          <div><div class="option-text">Gymrace</div><div class="option-sub">Competitieve gym prestaties</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Q3: Hoofddoel -->
-    <div class="question-block" id="q2">
-      <div class="question-label">Vraag 3 van 4</div>
-      <div class="question-text">Wat is jouw hoofddoel?</div>
-      <div class="options" id="options-2">
-        <div class="option" data-q="2" data-val="muscle">
-          <div class="option-icon">💪</div>
-          <div><div class="option-text">Spieren opbouwen</div><div class="option-sub">Meer massa & sterkte</div></div>
-        </div>
-        <div class="option" data-q="2" data-val="fat">
-          <div class="option-icon">🔥</div>
-          <div><div class="option-text">Vet verbranden</div><div class="option-sub">Body recomposition</div></div>
-        </div>
-        <div class="option" data-q="2" data-val="endurance">
-          <div class="option-icon">❤️</div>
-          <div><div class="option-text">Uithoudingsvermogen</div><div class="option-sub">Meer energie & conditie</div></div>
-        </div>
-        <div class="option" data-q="2" data-val="all">
-          <div class="option-icon">⭐</div>
-          <div><div class="option-text">Alles-in-een</div><div class="option-sub">Gebalanceerd totaal pakket</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Q4: Niveau -->
-    <div class="question-block" id="q3">
-      <div class="question-label">Vraag 4 van 4</div>
-      <div class="question-text">Wat is jouw ervaringsniveau?</div>
-      <div class="options" id="options-3">
-        <div class="option" data-q="3" data-val="beginner">
-          <div class="option-icon">🌱</div>
-          <div><div class="option-text">Beginner</div><div class="option-sub">Minder dan 1 jaar ervaring</div></div>
-        </div>
-        <div class="option" data-q="3" data-val="gevorderd">
-          <div class="option-icon">🌿</div>
-          <div><div class="option-text">Gevorderd</div><div class="option-sub">1–3 jaar ervaring</div></div>
-        </div>
-        <div class="option" data-q="3" data-val="geavanceerd">
-          <div class="option-icon">🌳</div>
-          <div><div class="option-text">Geavanceerd</div><div class="option-sub">3+ jaar ervaring</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="quiz-nav">
-      <button class="btn btn-back" id="btn-back" onclick="prevQuestion()" style="visibility:hidden;">Terug</button>
-      <button class="btn btn-next" id="btn-next" onclick="nextQuestion()" disabled>Volgende →</button>
-    </div>
+<div class="question-block active" id="q0">
+  <div class="question-label">Vraag 1 van 4</div>
+  <div class="question-text">Hoeveel keer per week kun je trainen?</div>
+  <div class="options">
+    <div class="option" data-q="0" data-val="2"><div class="option-icon">📅</div><div><div class="option-text">2x per week</div><div class="option-sub">Ideaal voor herstel & basis opbouw</div></div></div>
+    <div class="option" data-q="0" data-val="3"><div class="option-icon">📅</div><div><div class="option-text">3x per week</div><div class="option-sub">De meest populaire frequentie</div></div></div>
+    <div class="option" data-q="0" data-val="4"><div class="option-icon">📅</div><div><div class="option-text">4x per week</div><div class="option-sub">Meer volume, meer resultaat</div></div></div>
+    <div class="option" data-q="0" data-val="5"><div class="option-icon">📅</div><div><div class="option-text">5x per week</div><div class="option-sub">Full commitment</div></div></div>
   </div>
 </div>
 
-<!-- ═══════════ RESULT SCREEN ═══════════ -->
+<div class="question-block" id="q1">
+  <div class="question-label">Vraag 2 van 4</div>
+  <div class="question-text">Welke trainingsstijl past best bij jou?</div>
+  <div class="options">
+    <div class="option" data-q="1" data-val="bbb"><div class="option-icon">🍑</div><div><div class="option-text">BBB Focus</div><div class="option-sub">Glutes & Benen als hoofddoel</div></div></div>
+    <div class="option" data-q="1" data-val="fullbody"><div class="option-icon">💪</div><div><div class="option-text">Fullbody</div><div class="option-sub">Alles in één training</div></div></div>
+    <div class="option" data-q="1" data-val="split"><div class="option-icon">🔀</div><div><div class="option-text">Split Schema</div><div class="option-sub">Upper / Lower verdeling</div></div></div>
+    <div class="option" data-q="1" data-val="hybrid-strength"><div class="option-icon">⚡</div><div><div class="option-text">Hybrid Strength</div><div class="option-sub">Kracht + Conditie combo</div></div></div>
+    <div class="option" data-q="1" data-val="hybrid-run"><div class="option-icon">🏃</div><div><div class="option-text">Hybrid Run</div><div class="option-sub">Kracht + Hardlopen</div></div></div>
+    <div class="option" data-q="1" data-val="crossfit"><div class="option-icon">🔥</div><div><div class="option-text">CrossFit / Circuit</div><div class="option-sub">High intensity, korte rust</div></div></div>
+    <div class="option" data-q="1" data-val="hyrox"><div class="option-icon">🏅</div><div><div class="option-text">Hyrox</div><div class="option-sub">Functionele kracht + uithoudingsvermogen</div></div></div>
+    <div class="option" data-q="1" data-val="triathlon"><div class="option-icon">🥇</div><div><div class="option-text">Triathlon</div><div class="option-sub">Zwimmen + Fietsen + Hardlopen</div></div></div>
+    <div class="option" data-q="1" data-val="gymrace"><div class="option-icon">🏋️</div><div><div class="option-text">Gymrace</div><div class="option-sub">Competitieve gym prestaties</div></div></div>
+  </div>
+</div>
+
+<div class="question-block" id="q2">
+  <div class="question-label">Vraag 3 van 4</div>
+  <div class="question-text">Wat is jouw hoofddoel?</div>
+  <div class="options">
+    <div class="option" data-q="2" data-val="muscle"><div class="option-icon">💪</div><div><div class="option-text">Spieren opbouwen</div><div class="option-sub">Meer massa & sterkte</div></div></div>
+    <div class="option" data-q="2" data-val="fat"><div class="option-icon">🔥</div><div><div class="option-text">Vet verbranden</div><div class="option-sub">Body recomposition</div></div></div>
+    <div class="option" data-q="2" data-val="endurance"><div class="option-icon">❤️</div><div><div class="option-text">Uithoudingsvermogen</div><div class="option-sub">Meer energie & conditie</div></div></div>
+    <div class="option" data-q="2" data-val="all"><div class="option-icon">⭐</div><div><div class="option-text">Alles-in-een</div><div class="option-sub">Gebalanceerd totaal pakket</div></div></div>
+  </div>
+</div>
+
+<div class="question-block" id="q3">
+  <div class="question-label">Vraag 4 van 4</div>
+  <div class="question-text">Wat is jouw ervaringsniveau?</div>
+  <div class="options">
+    <div class="option" data-q="3" data-val="beginner"><div class="option-icon">🌱</div><div><div class="option-text">Beginner</div><div class="option-sub">Minder dan 1 jaar ervaring</div></div></div>
+    <div class="option" data-q="3" data-val="gevorderd"><div class="option-icon">🌿</div><div><div class="option-text">Gevorderd</div><div class="option-sub">1–3 jaar ervaring</div></div></div>
+    <div class="option" data-q="3" data-val="geavanceerd"><div class="option-icon">🌳</div><div><div class="option-text">Geavanceerd</div><div class="option-sub">3+ jaar ervaring</div></div></div>
+  </div>
+</div>
+
+<div class="quiz-nav">
+  <button class="btn btn-back" id="btn-back" onclick="prevQ()" style="visibility:hidden">Terug</button>
+  <button class="btn btn-next" id="btn-next" onclick="nextQ()" disabled>Volgende →</button>
+</div>
+</div>
+</div>
+
+<!-- RESULT -->
 <div id="result-screen" class="screen">
   <div class="result-header">
-    <div class="brand-small">Academy Overgewicht</div>
+    <div class="brand-small">Academie over Gewicht</div>
     <div class="actions">
       <button class="btn-restart" onclick="restart()">↩ Opnieuw</button>
-      <button class="btn-pdf" onclick="downloadPDF()">⬇ Download PDF</button>
+      <button class="btn-pdf" onclick="window.print()">⬇ Download PDF</button>
     </div>
   </div>
-  <div class="result-content" id="result-content">
-    <!-- Dynamisch gegenereerd -->
-  </div>
+  <div class="result-content" id="result-content"></div>
 </div>
 
-<!-- ═══════════ LOADING ═══════════ -->
-<div class="loading-overlay" id="loading">
-  <div class="loader"></div>
-  <p>Schema wordt gegenereerd...</p>
-</div>
+<div class="loading-overlay" id="loading"><div class="loader"></div><p>Schema wordt gegenereerd...</p></div>
 
 <script>
-// ─── STATE ───
-let currentQ = 0;
-const answers = { 0: null, 1: null, 2: null, 3: null };
-const totalQ = 4;
-
-// ─── QUIZ LOGIC ───
-document.querySelectorAll('.option').forEach(opt => {
-  opt.addEventListener('click', function() {
-    const q = this.dataset.q;
-    document.querySelectorAll(`.option[data-q="${q}"]`).forEach(o => o.classList.remove('selected'));
+// ─── QUIZ ───
+let cQ=0;
+const ans={0:null,1:null,2:null,3:null};
+document.querySelectorAll('.option').forEach(o=>{
+  o.addEventListener('click',function(){
+    const q=this.dataset.q;
+    document.querySelectorAll(`.option[data-q="${q}"]`).forEach(x=>x.classList.remove('selected'));
     this.classList.add('selected');
-    answers[q] = this.dataset.val;
-    document.getElementById('btn-next').disabled = false;
+    ans[q]=this.dataset.val;
+    document.getElementById('btn-next').disabled=false;
   });
 });
-
-function updateProgress() {
-  for (let i = 0; i < totalQ; i++) {
-    document.getElementById('dot-' + i).classList.toggle('filled', i <= currentQ);
-  }
-  document.getElementById('btn-back').style.visibility = currentQ === 0 ? 'hidden' : 'visible';
-  document.getElementById('btn-next').textContent = currentQ === totalQ - 1 ? 'Genereer Schema →' : 'Volgende →';
-  document.getElementById('btn-next').disabled = answers[currentQ] === null;
+function updProg(){
+  for(let i=0;i<4;i++)document.getElementById('dot-'+i).classList.toggle('filled',i<=cQ);
+  document.getElementById('btn-back').style.visibility=cQ===0?'hidden':'visible';
+  document.getElementById('btn-next').textContent=cQ===3?'Genereer Schema →':'Volgende →';
+  document.getElementById('btn-next').disabled=ans[cQ]===null;
 }
+function showQ(i){document.querySelectorAll('.question-block').forEach(q=>q.classList.remove('active'));document.getElementById('q'+i).classList.add('active');updProg()}
+function nextQ(){if(ans[cQ]===null)return;if(cQ<3){cQ++;showQ(cQ)}else generate()}
+function prevQ(){if(cQ>0){cQ--;showQ(cQ)}}
+function restart(){cQ=0;[0,1,2,3].forEach(k=>ans[k]=null);document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));document.getElementById('btn-next').disabled=true;document.getElementById('quiz-screen').classList.add('active');document.getElementById('result-screen').classList.remove('active');showQ(0)}
 
-function showQuestion(idx) {
-  document.querySelectorAll('.question-block').forEach(q => q.classList.remove('active'));
-  document.getElementById('q' + idx).classList.add('active');
-  updateProgress();
-}
+// ─── DATA ───
+const SN={bbb:'BBB Focus (Glutes & Benen)',fullbody:'Fullbody',split:'Split (Upper/Lower)','hybrid-strength':'Hybrid Strength','hybrid-run':'Hybrid Run',crossfit:'CrossFit / Circuit',hyrox:'Hyrox',triathlon:'Triathlon',gymrace:'Gymrace'};
+const GN={muscle:'Spieren opbouwen',fat:'Vet verbranden',endurance:'Uithoudingsvermogen',all:'Alles-in-een'};
+const LN={beginner:'Beginner',gevorderd:'Gevorderd',geavanceerd:'Geavanceerd'};
 
-function nextQuestion() {
-  if (answers[currentQ] === null) return;
-  if (currentQ < totalQ - 1) {
-    currentQ++;
-    showQuestion(currentQ);
-  } else {
-    generateSchema();
-  }
-}
+// eq: 'bb'=Barbell, 'db'=Dumbbell, 'kb'=Kettlebell, 'bw'=Bodyweight, null=machine/other
+function eqBadge(eq){if(!eq)return '';const m={bb:'Barbell',db:'Dumbbell',kb:'Kettlebell',bw:'Bodyweight'};return `<span class="eq-badge">${m[eq]||eq}</span>`}
 
-function prevQuestion() {
-  if (currentQ > 0) {
-    currentQ--;
-    showQuestion(currentQ);
-  }
-}
+// ─── EXERCISE POOLS (grouped by day) ───
+// Each day ~9-10 exercises → ~55-65 min training
+function getPool(style,level){
+  const adv=level==='geavanceerd',mid=level==='gevorderd';
+  const s=adv?4:mid?3:3; // base sets
 
-function restart() {
-  currentQ = 0;
-  Object.keys(answers).forEach(k => answers[k] = null);
-  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-  document.getElementById('btn-next').disabled = true;
-  document.getElementById('quiz-screen').classList.add('active');
-  document.getElementById('result-screen').classList.remove('active');
-  showQuestion(0);
-}
-
-// ─── SCHEMA DATA ───
-const styleNames = {
-  bbb: 'BBB Focus (Glutes & Benen)',
-  fullbody: 'Fullbody',
-  split: 'Split (Upper/Lower)',
-  'hybrid-strength': 'Hybrid Strength',
-  'hybrid-run': 'Hybrid Run',
-  crossfit: 'CrossFit / Circuit',
-  hyrox: 'Hyrox',
-  triathlon: 'Triathlon',
-  gymrace: 'Gymrace'
-};
-
-const goalNames = { muscle: 'Spieren opbouwen', fat: 'Vet verbranden', endurance: 'Uithoudingsvermogen', all: 'Alles-in-een' };
-const levelNames = { beginner: 'Beginner', gevorderd: 'Gevorderd', geavanceerd: 'Geavanceerd' };
-
-// Base exercises per style
-function getExercises(style, level, goal) {
-  const isAdv = level === 'geavanceerd';
-  const isMid = level === 'gevorderd';
-
-  const pools = {
-    bbb: [
-      { name: 'Goblet squat', sets: 3, reps: '10', rest: '60s', note: 'Knie niet over teennen' },
-      { name: 'Glute bridge', sets: 3, reps: '12', rest: '45s', note: 'Knip bovenaan' },
-      { name: 'Romanian deadlift', sets: 3, reps: '10', rest: '60s', note: 'Rug recht voorbuigen' },
-      { name: 'Lunges (voorwaarts)', sets: 2, reps: '8 per been', rest: '45s', note: 'Knie achter teennen' },
-      { name: 'Kalf raises', sets: 3, reps: '12', rest: '30s', note: 'Heel volledig omhoog' },
-      { name: 'Sumo squat', sets: 3, reps: '10', rest: '60s', note: 'Voeten breed, rug recht' },
-      { name: 'Hip thrust', sets: 3, reps: '12', rest: '45s', note: 'Rug op bank, knip bovenaan' },
-      { name: 'Step-ups', sets: 2, reps: '8 per been', rest: '45s', note: 'Voet volledig op de stap' },
-      { name: 'Glute kickback', sets: 2, reps: '10 per been', rest: '30s', note: 'Benen recht achteruit' },
-      { name: 'Bulgarian split squat', sets: 2, reps: '8 per been', rest: '60s', note: 'Achterbeen op bank' },
-      { name: 'Glute bridge (unilateraal)', sets: 2, reps: '8 per been', rest: '45s', note: 'Op één ben' },
-      { name: 'RDL (unilateraal)', sets: 2, reps: '8 per been', rest: '60s', note: 'Balans op één ben' },
-    ],
-    fullbody: [
-      { name: 'Squat', sets: 3, reps: '8', rest: '90s', note: 'Controleer de neergaande beweging' },
-      { name: 'Bankdrukken (dumbbell)', sets: 3, reps: '10', rest: '60s', note: 'Schouders in de bank' },
-      { name: 'Bent-over row', sets: 3, reps: '10', rest: '60s', note: 'Ellebogen langs de romp' },
-      { name: 'Romanian deadlift', sets: 3, reps: '8', rest: '90s', note: 'Benen licht gebogen' },
-      { name: 'Overhead press', sets: 3, reps: '8', rest: '60s', note: 'Corespan aanhouden' },
-      { name: 'Lunges', sets: 2, reps: '8 per been', rest: '45s', note: 'Knie op 90 graden' },
-      { name: 'Lat pulldown', sets: 3, reps: '10', rest: '45s', note: 'Schouders omlaag trekken' },
-      { name: 'Plank', sets: 2, reps: '30 sec', rest: '30s', note: 'Lichaam als 1 lijn' },
-    ],
-    split: [
-      // Upper
-      { name: 'Bankdrukken', sets: 4, reps: '8', rest: '90s', note: 'Upper — voet plat op de grond', day: 'Upper' },
-      { name: 'Overhead press', sets: 3, reps: '8', rest: '60s', note: 'Staand of zittend', day: 'Upper' },
-      { name: 'Bent-over row', sets: 4, reps: '8', rest: '60s', note: 'Elbows langs de romp', day: 'Upper' },
-      { name: 'Lat pulldown', sets: 3, reps: '10', rest: '45s', note: 'Breed pakken', day: 'Upper' },
-      { name: 'Bicep curl', sets: 3, reps: '10', rest: '30s', note: 'Langzaam terugzakken', day: 'Upper' },
-      { name: 'Tricep dips', sets: 3, reps: '10', rest: '30s', note: 'Ellebogen recht achteruit', day: 'Upper' },
-      // Lower
-      { name: 'Squat', sets: 4, reps: '8', rest: '90s', note: 'Lower — diepe squat', day: 'Lower' },
-      { name: 'Romanian deadlift', sets: 3, reps: '8', rest: '90s', note: 'Gewicht dicht bij lichaam', day: 'Lower' },
-      { name: 'Leg press', sets: 3, reps: '10', rest: '60s', note: 'Voeten midden-hoog', day: 'Lower' },
-      { name: 'Lunges', sets: 3, reps: '8 per been', rest: '45s', note: 'Controleer de beweging', day: 'Lower' },
-      { name: 'Leg curl', sets: 3, reps: '10', rest: '45s', note: 'Langzaam terug', day: 'Lower' },
-      { name: 'Kalf raises', sets: 3, reps: '15', rest: '30s', note: 'Volledig uitstrekken', day: 'Lower' },
-    ],
-    'hybrid-strength': [
-      { name: 'Squat', sets: 4, reps: '6', rest: '90s', note: 'Kracht blok — zwaar gewicht' },
-      { name: 'Bankdrukken', sets: 3, reps: '8', rest: '60s', note: 'Controleer tempo' },
-      { name: 'Deadlift', sets: 3, reps: '5', rest: '120s', note: 'Rech rug, gewicht dicht' },
-      { name: 'Burpees', sets: 3, reps: '8', rest: '45s', note: 'Conditie blok — tempo tempo' },
-      { name: 'Kettlebell swing', sets: 3, reps: '12', rest: '45s', note: 'Hips vooruit stoten' },
-      { name: 'Box jumps', sets: 3, reps: '6', rest: '60s', note: 'Zacht landen' },
-      { name: 'Overhead press', sets: 3, reps: '8', rest: '60s', note: 'Corespan aanhouden' },
-      { name: 'Mountain climbers', sets: 3, reps: '20 total', rest: '30s', note: 'Snel en controlled' },
-    ],
-    'hybrid-run': [
-      { name: 'Squat', sets: 3, reps: '8', rest: '60s', note: 'Kracht blok' },
-      { name: 'Romanian deadlift', sets: 3, reps: '8', rest: '60s', note: 'Benen licht gebogen' },
-      { name: 'Lunges', sets: 3, reps: '8 per been', rest: '45s', note: 'Controleer de beweging' },
-      { name: 'Plank', sets: 2, reps: '40 sec', rest: '30s', note: 'Core stabiel houden' },
-      { name: 'Hardlopen (interval)', sets: 1, reps: '20 min', rest: '—', note: 'Run blok — 2 min hard / 1 min rustig' },
-      { name: 'Overhead press', sets: 3, reps: '10', rest: '45s', note: 'Schouders sterk' },
-      { name: 'Glute bridge', sets: 3, reps: '12', rest: '30s', note: 'Knip bovenaan' },
-      { name: 'Hardlopen (duur)', sets: 1, reps: '30 min', rest: '—', note: 'Rustige pace, fokus op ritme' },
-    ],
-    crossfit: [
-      { name: 'Thrusters', sets: 3, reps: '10', rest: '45s', note: 'Squat + press in 1 beweging' },
-      { name: 'Burpees', sets: 3, reps: '8', rest: '30s', note: 'Tempo bewaren' },
-      { name: 'Kettlebell swing', sets: 3, reps: '12', rest: '30s', note: 'Hips vooruit' },
-      { name: 'Box jumps', sets: 3, reps: '6', rest: '45s', note: 'Zacht landen' },
-      { name: 'Wall ball', sets: 3, reps: '10', rest: '30s', note: 'Squat en gooi omhoog' },
-      { name: 'Mountain climbers', sets: 3, reps: '20 total', rest: '20s', note: 'Snel en controlled' },
-      { name: 'Pull-ups (of lat pulldown)', sets: 3, reps: '6', rest: '45s', note: 'Volledig uit strekken' },
-      { name: 'Rowing machine', sets: 1, reps: '3 min', rest: '—', note: 'Tempo: kracht uit de hips' },
-    ],
-    hyrox: [
-      { name: 'Squat', sets: 4, reps: '8', rest: '60s', note: 'Functionele kracht' },
-      { name: 'Sled push (of lunges)', sets: 3, reps: '10 per been', rest: '60s', note: 'Vooruit stappen met kracht' },
-      { name: 'Burpees', sets: 3, reps: '8', rest: '45s', note: 'Snel omstaan' },
-      { name: 'Kettlebell swing', sets: 4, reps: '12', rest: '45s', note: 'Explosieve hips' },
-      { name: 'Rowing machine', sets: 1, reps: '4 min', rest: '—', note: 'Uithoudingsvermogen — tempo houden' },
-      { name: 'Wall balls', sets: 3, reps: '10', rest: '30s', note: 'Squat diep en gooi hoog' },
-      { name: 'Sandbag carry (of gewogten wandelen)', sets: 2, reps: '40m', rest: '60s', note: 'Gewicht dicht bij lichaam' },
-      { name: 'Deadlift', sets: 3, reps: '6', rest: '90s', note: 'Zwaar, gecontroleerd' },
-    ],
-    triathlon: [
-      { name: 'Zwimmen (of planken)', sets: 1, reps: '20 min', rest: '—', note: 'Zwim blok — wissel stijl elke 2 minuten' },
-      { name: 'Fiets (of stationary bike)', sets: 1, reps: '25 min', rest: '—', note: 'Fiets blok — constante cadentie' },
-      { name: 'Hardlopen', sets: 1, reps: '20 min', rest: '—', note: 'Run blok — rustige pace' },
-      { name: 'Squat', sets: 3, reps: '10', rest: '60s', note: 'Kracht onderhoud' },
-      { name: 'Plank', sets: 3, reps: '40 sec', rest: '30s', note: 'Core voor uithoudingsvermogen' },
-      { name: 'Overhead press', sets: 3, reps: '8', rest: '45s', note: 'Bovenlichaam sterkt' },
-      { name: 'Romanian deadlift', sets: 3, reps: '8', rest: '60s', note: 'Hamstrings en rug' },
-      { name: 'Kalf raises', sets: 3, reps: '15', rest: '30s', note: 'Hardlopen ondersteuning' },
-    ],
-    gymrace: [
-      { name: 'Squat', sets: 4, reps: '6', rest: '120s', note: 'Competitie patroon — zwaar' },
-      { name: 'Bankdrukken', sets: 4, reps: '6', rest: '90s', note: 'Maximale kracht' },
-      { name: 'Deadlift', sets: 3, reps: '5', rest: '120s', note: 'Techniek is alles' },
-      { name: 'Overhead press', sets: 3, reps: '6', rest: '90s', note: 'Staan of zitten' },
-      { name: 'Bent-over row', sets: 4, reps: '8', rest: '60s', note: 'Rug sterk houden' },
-      { name: 'Romanian deadlift', sets: 3, reps: '8', rest: '60s', note: 'Hypertrofie blok' },
-      { name: 'Pull-ups', sets: 3, reps: '6', rest: '60s', note: 'Volledig uit stretchen' },
-      { name: 'Bicep curl', sets: 3, reps: '10', rest: '30s', note: 'Isolation finish' },
-    ],
+  const P={
+    bbb:{
+      A:[
+        {n:'Goblet squat',eq:'db',s:s,r:10,rest:'60s',note:'Knie niet over teennen, rug recht'},
+        {n:'Romanian deadlift',eq:'db',s:s,r:10,rest:'75s',note:'Benen licht gebogen, gewicht dicht bij lichaam'},
+        {n:'Hip thrust',eq:'db',s:s,r:12,rest:'60s',note:'Rug op bank, gewicht op heupen, knip bovenaan'},
+        {n:'Walking lunges',eq:'db',s:3,r:'10/been',rest:'45s',note:'Knie achter teennen voorbeen'},
+        {n:'Sumo squat',eq:'db',s:s,r:10,rest:'60s',note:'Voeten breed, tenen naar buiten'},
+        {n:'Glute kickback',eq:'bw',s:3,r:'12/been',rest:'30s',note:'Op handen en knieen, been recht achteruit'},
+        {n:'Kalf raises',eq:'db',s:3,r:15,rest:'30s',note:'Heel volledig omhoog en omlaag'},
+        {n:'Ab wheel',eq:null,s:3,r:10,rest:'30s',note:'Rug recht houden, langzaam uit rollen'},
+        {n:'Dead bug',eq:'bw',s:3,r:'10/zijde',rest:'30s',note:'Rug plat op de grond, core vast'},
+      ],
+      B:[
+        {n:'Barbell squat',eq:'bb',s:s,r:8,rest:'90s',note:'Diepe squat, rug recht'},
+        {n:'Bulgarian split squat',eq:'db',s:s,r:'8/been',rest:'75s',note:'Achterbeen op bank, voorbeen voor je'},
+        {n:'Leg press',eq:null,s:s,r:10,rest:'75s',note:'Voeten midden-hoog op het platform'},
+        {n:'RDL (unilateraal)',eq:'db',s:3,r:'8/been',rest:'60s',note:'Balans op één ben, gewicht voor je body'},
+        {n:'Step-ups',eq:'db',s:3,r:'10/been',rest:'45s',note:'Voet volledig op de stap'},
+        {n:'Leg curl',eq:null,s:s,r:10,rest:'45s',note:'Langzaam terug zakken'},
+        {n:'Adductor press',eq:null,s:3,r:12,rest:'30s',note:'Langzame gecontroleerde beweging'},
+        {n:'Glute bridge (unilateraal)',eq:'bw',s:3,r:'10/been',rest:'30s',note:'Op één ben, andere uit strekken'},
+        {n:'Copenhagen plank',eq:null,s:2,r:'20s/zijde',rest:'30s',note:'Lichaam als 1 lijn houden'},
+      ],
+      C:[
+        {n:'Sumo deadlift',eq:'bb',s:s,r:6,rest:'90s',note:'Brede stand, gewicht tussen benen'},
+        {n:'Squat pulse',eq:'db',s:3,r:15,rest:'35s',note:'Blijf in de squat, puls omlaag'},
+        {n:'Lateral lunge',eq:'db',s:3,r:'8/zijde',rest:'45s',note:'Zak op één ben naar opzij'},
+        {n:'Glute bridge (pulse)',eq:'db',s:3,r:15,rest:'35s',note:'Blijf bovenaan, puls'},
+        {n:'Hip abduction',eq:null,s:3,r:12,rest:'30s',note:'Langzame gecontroleerde beweging'},
+        {n:'Calf raises (unilateraal)',eq:'bw',s:3,r:'12/been',rest:'30s',note:'Op een rand staan voor range'},
+        {n:'Wall sit',eq:'bw',s:2,r:'40s',rest:'45s',note:'Rug tegen de muur, knieen 90 graden'},
+        {n:'Hyperextension',eq:'bw',s:3,r:12,rest:'30s',note:'Langzaam terug zakken, niet overstrukken'},
+        {n:'Pallof press',eq:null,s:3,r:'10/zijde',rest:'30s',note:'Core vast houden tegen de rotatie'},
+      ],
+    },
+    fullbody:{
+      A:[
+        {n:'Barbell squat',eq:'bb',s:4,r:8,rest:'90s',note:'Diepe squat, rug recht'},
+        {n:'Bankdrukken',eq:'bb',s:4,r:8,rest:'75s',note:'Schouders in de bank vastzetten'},
+        {n:'Bent-over row',eq:'bb',s:4,r:8,rest:'60s',note:'Ellebogen langs de romp trekken'},
+        {n:'Romanian deadlift',eq:'db',s:3,r:10,rest:'75s',note:'Benen licht gebogen'},
+        {n:'Overhead press',eq:'db',s:3,r:8,rest:'60s',note:'Staand, corespan aanhouden'},
+        {n:'Walking lunges',eq:'db',s:3,r:'8/been',rest:'45s',note:'Knie op 90 graden'},
+        {n:'Lat pulldown',eq:null,s:3,r:10,rest:'45s',note:'Breed pakken, schouders omlaag'},
+        {n:'Bicep curl',eq:'db',s:3,r:10,rest:'30s',note:'Langzaam terug zakken'},
+        {n:'Tricep dips',eq:'bw',s:3,r:10,rest:'30s',note:'Ellebogen achteruit, lichaam dicht bij bank'},
+        {n:'Plank',eq:'bw',s:3,r:'45s',rest:'30s',note:'Lichaam als 1 lijn, core vast'},
+      ],
+      B:[
+        {n:'Deadlift',eq:'bb',s:4,r:6,rest:'120s',note:'Rug recht, gewicht dicht bij lichaam'},
+        {n:'Incline dumbbell press',eq:'db',s:4,r:10,rest:'60s',note:'Bank op 30-45 graden'},
+        {n:'Pull-ups',eq:'bw',s:3,r:6,rest:'75s',note:'Volledig uit stretchen onderaan'},
+        {n:'Bulgarian split squat',eq:'db',s:3,r:'8/been',rest:'60s',note:'Achterbeen op bank'},
+        {n:'Cable row',eq:null,s:3,r:10,rest:'45s',note:'Schouders vast houden, ellebogen langs romp'},
+        {n:'Hip thrust',eq:'db',s:3,r:12,rest:'45s',note:'Knip bovenaan en weg houden 2 sec'},
+        {n:'Shoulder lateral raise',eq:'db',s:3,r:12,rest:'30s',note:'Niet hoger dan schouders'},
+        {n:'Hammer curl',eq:'db',s:3,r:10,rest:'30s',note:'Duimen naar boven'},
+        {n:'Tricep overhead extension',eq:'db',s:3,r:10,rest:'30s',note:'Ellebogen vast houden'},
+        {n:'Dead bug',eq:'bw',s:3,r:'10/zijde',rest:'30s',note:'Rug plat op de grond'},
+      ],
+    },
+    split:{
+      Upper:[
+        {n:'Bankdrukken',eq:'bb',s:4,r:8,rest:'90s',note:'Schouders in de bank vastzetten'},
+        {n:'Overhead press',eq:'bb',s:4,r:6,rest:'75s',note:'Staand of zittend, core vast'},
+        {n:'Bent-over row',eq:'bb',s:4,r:8,rest:'60s',note:'Ellebogen langs de romp'},
+        {n:'Incline dumbbell press',eq:'db',s:3,r:10,rest:'60s',note:'Bank op 30-45 graden'},
+        {n:'Pull-ups',eq:'bw',s:3,r:6,rest:'75s',note:'Volledig uit stretchen'},
+        {n:'Lat pulldown',eq:null,s:3,r:10,rest:'45s',note:'Breed pakken'},
+        {n:'Shoulder lateral raise',eq:'db',s:3,r:12,rest:'30s',note:'Niet hoger dan schouders'},
+        {n:'Bicep curl',eq:'db',s:3,r:10,rest:'30s',note:'Langzaam terug zakken'},
+        {n:'Tricep dips',eq:'bw',s:3,r:10,rest:'30s',note:'Ellebogen achteruit'},
+        {n:'Facepull',eq:null,s:3,r:15,rest:'30s',note:'Ellebogen hoog en achteruit'},
+      ],
+      Lower:[
+        {n:'Barbell squat',eq:'bb',s:4,r:8,rest:'90s',note:'Diepe squat, rug recht'},
+        {n:'Romanian deadlift',eq:'bb',s:4,r:8,rest:'75s',note:'Gewicht dicht bij lichaam'},
+        {n:'Leg press',eq:null,s:4,r:10,rest:'60s',note:'Voeten midden-hoog'},
+        {n:'Walking lunges',eq:'db',s:3,r:'10/been',rest:'45s',note:'Gecontroleerde beweging'},
+        {n:'Leg curl',eq:null,s:3,r:10,rest:'45s',note:'Langzaam terug zakken'},
+        {n:'Hip thrust',eq:'db',s:3,r:12,rest:'45s',note:'Knip bovenaan'},
+        {n:'Kalf raises',eq:null,s:4,r:15,rest:'30s',note:'Heel volledig uitstrekken'},
+        {n:'Adductor press',eq:null,s:3,r:12,rest:'30s',note:'Langzame beweging'},
+        {n:'Copenhagen plank',eq:null,s:2,r:'20s/zijde',rest:'30s',note:'Lichaam recht'},
+        {n:'Pallof press',eq:null,s:3,r:'10/zijde',rest:'30s',note:'Core vast houden'},
+      ],
+    },
+    'hybrid-strength':{
+      A:[
+        {n:'Barbell squat',eq:'bb',s:4,r:6,rest:'120s',note:'Zwaar gewicht, diepe squat'},
+        {n:'Bankdrukken',eq:'bb',s:4,r:6,rest:'90s',note:'Maximale spanning'},
+        {n:'Deadlift',eq:'bb',s:3,r:5,rest:'120s',note:'Rug recht, explosief omhoog'},
+        {n:'Overhead press',eq:'bb',s:3,r:6,rest:'75s',note:'Corespan aanhouden'},
+        {n:'Kettlebell swing',eq:'kb',s:4,r:12,rest:'45s',note:'Hips vooruit stoten'},
+        {n:'Burpees',eq:'bw',s:3,r:10,rest:'45s',note:'Bewaar het tempo'},
+        {n:'Box jumps',eq:null,s:3,r:8,rest:'60s',note:'Zacht landen op beide voeten'},
+        {n:'Mountain climbers',eq:'bw',s:3,r:'20 tot.',rest:'30s',note:'Snel en gecontroleerd'},
+        {n:'Battle ropes',eq:null,s:3,r:'30s',rest:'30s',note:'Rythmisch golven'},
+        {n:'Plank',eq:'bw',s:3,r:'45s',rest:'30s',note:'Lichaam als 1 lijn'},
+      ],
+      B:[
+        {n:'Romanian deadlift',eq:'bb',s:4,r:6,rest:'90s',note:'Gewicht dicht bij lichaam'},
+        {n:'Bent-over row',eq:'bb',s:4,r:6,rest:'75s',note:'Ellebogen langs romp'},
+        {n:'Pull-ups',eq:'bw',s:3,r:6,rest:'75s',note:'Volledig uit stretchen'},
+        {n:'Bulgarian split squat',eq:'db',s:3,r:'8/been',rest:'60s',note:'Achterbeen op bank'},
+        {n:'Thrusters',eq:'db',s:3,r:10,rest:'45s',note:'Squat + press in 1 beweging'},
+        {n:'Rowing machine',eq:null,s:1,r:'4 min',rest:'—',note:'Kracht uit de hips'},
+        {n:'Wall balls',eq:null,s:3,r:10,rest:'30s',note:'Diepe squat en gooi hoog'},
+        {n:'Slam balls',eq:null,s:3,r:10,rest:'30s',note:'Explosief omlaag slagen'},
+        {n:'Dead bug',eq:'bw',s:3,r:'10/zijde',rest:'30s',note:'Core vast'},
+        {n:'Pallof press',eq:null,s:3,r:'10/zijde',rest:'30s',note:'Rotatie weerstand'},
+      ],
+    },
+    'hybrid-run':{
+      A:[
+        {n:'Barbell squat',eq:'bb',s:4,r:8,rest:'75s',note:'Diepe squat'},
+        {n:'Romanian deadlift',eq:'db',s:3,r:10,rest:'60s',note:'Benen licht gebogen'},
+        {n:'Walking lunges',eq:'db',s:3,r:'10/been',rest:'45s',note:'Gecontroleerde beweging'},
+        {n:'Hip thrust',eq:'db',s:3,r:12,rest:'45s',note:'Knip bovenaan'},
+        {n:'Bent-over row',eq:'db',s:3,r:10,rest:'45s',note:'Ellebogen langs romp'},
+        {n:'Overhead press',eq:'db',s:3,r:8,rest:'45s',note:'Corespan aanhouden'},
+        {n:'Hardlopen (interval)',eq:null,s:1,r:'20 min',rest:'—',note:'2 min hard / 1 min rustig'},
+        {n:'Kalf raises',eq:'bw',s:3,r:15,rest:'30s',note:'Ondersteuning voor hardlopen'},
+        {n:'Plank',eq:'bw',s:3,r:'45s',rest:'30s',note:'Core vast'},
+        {n:'Dead bug',eq:'bw',s:3,r:'10/zijde',rest:'30s',note:'Rug plat'},
+      ],
+      B:[
+        {n:'Hardlopen (duur)',eq:null,s:1,r:'35 min',rest:'—',note:'Rustige pace, ritme houden'},
+        {n:'Bulgarian split squat',eq:'db',s:3,r:'8/been',rest:'60s',note:'Achterbeen op bank'},
+        {n:'Glute bridge',eq:'db',s:3,r:12,rest:'45s',note:'Knip bovenaan'},
+        {n:'Leg curl',eq:null,s:3,r:10,rest:'45s',note:'Langzaam terug'},
+        {n:'Kalf raises',eq:'db',s:3,r:15,rest:'30s',note:'Heel volledig omhoog'},
+        {n:'Rowing machine',eq:null,s:1,r:'5 min',rest:'—',note:'Rustig tempo herstel'},
+        {n:'Shoulder lateral raise',eq:'db',s:3,r:12,rest:'30s',note:'Niet hoger dan schouders'},
+        {n:'Bicep curl',eq:'db',s:3,r:10,rest:'30s',note:'Langzaam'},
+        {n:'Copenhagen plank',eq:null,s:2,r:'20s/zijde',rest:'30s',note:'Lichaam recht'},
+        {n:'Pallof press',eq:null,s:3,r:'10/zijde',rest:'30s',note:'Core vast'},
+      ],
+    },
+    crossfit:{
+      A:[
+        {n:'Thrusters',eq:'db',s:4,r:10,rest:'45s',note:'Squat + press in 1 beweging'},
+        {n:'Kettlebell swing',eq:'kb',s:4,r:12,rest:'30s',note:'Hips vooruit stoten'},
+        {n:'Burpees',eq:'bw',s:4,r:10,rest:'30s',note:'Bewaar tempo'},
+        {n:'Box jumps',eq:null,s:3,r:8,rest:'45s',note:'Zacht landen'},
+        {n:'Wall balls',eq:null,s:3,r:10,rest:'30s',note:'Diepe squat, gooi hoog'},
+        {n:'Mountain climbers',eq:'bw',s:3,r:'20 tot.',rest:'20s',note:'Snel en gecontroleerd'},
+        {n:'Pull-ups',eq:'bw',s:3,r:6,rest:'60s',note:'Volledig uit stretchen'},
+        {n:'Rowing machine',eq:null,s:1,r:'4 min',rest:'—',note:'Kracht uit de hips'},
+        {n:'Slam balls',eq:null,s:3,r:10,rest:'30s',note:'Explosief omlaag'},
+        {n:'Plank to push-up',eq:'bw',s:3,r:8,rest:'30s',note:'Lichaam recht houden'},
+      ],
+      B:[
+        {n:'Barbell squat',eq:'bb',s:4,r:8,rest:'75s',note:'Diepe squat'},
+        {n:'Bankdrukken',eq:'bb',s:3,r:8,rest:'60s',note:'Schouders in de bank'},
+        {n:'Deadlift',eq:'bb',s:3,r:6,rest:'90s',note:'Rug recht'},
+        {n:'Kettlebell goblet squat',eq:'kb',s:3,r:12,rest:'45s',note:'Rug recht, diepe squat'},
+        {n:'Sled push',eq:null,s:3,r:'30s',rest:'60s',note:'Vooruit stappen met kracht'},
+        {n:'Battle ropes',eq:null,s:3,r:'30s',rest:'30s',note:'Rythmisch'},
+        {n:'Rowing machine',eq:null,s:1,r:'3 min',rest:'—',note:'Tempo houden'},
+        {n:'Burpee to box jump',eq:null,s:3,r:6,rest:'60s',note:'Explosief combo'},
+        {n:'Dead bug',eq:'bw',s:3,r:'10/zijde',rest:'30s',note:'Core vast'},
+        {n:'Copenhagen plank',eq:null,s:2,r:'20s/zijde',rest:'30s',note:'Lichaam recht'},
+      ],
+    },
+    hyrox:{
+      A:[
+        {n:'Barbell squat',eq:'bb',s:4,r:8,rest:'75s',note:'Functionele kracht'},
+        {n:'Deadlift',eq:'bb',s:3,r:6,rest:'90s',note:'Explosief omhoog'},
+        {n:'Kettlebell swing',eq:'kb',s:4,r:15,rest:'45s',note:'Explosieve hips'},
+        {n:'Sled push',eq:null,s:4,r:'40s',rest:'60s',note:'Vooruit stappen met kracht'},
+        {n:'Wall balls',eq:null,s:4,r:12,rest:'30s',note:'Diepe squat, gooi hoog'},
+        {n:'Rowing machine',eq:null,s:1,r:'5 min',rest:'—',note:'Tempo houden'},
+        {n:'Sandbag carry',eq:null,s:3,r:'50m',rest:'60s',note:'Gewicht dicht bij lichaam'},
+        {n:'Burpees',eq:'bw',s:3,r:10,rest:'30s',note:'Snel omstaan'},
+        {n:'Walking lunges',eq:'db',s:3,r:'10/been',rest:'45s',note:'Gecontroleerd'},
+        {n:'Plank',eq:'bw',s:3,r:'45s',rest:'30s',note:'Core vast'},
+      ],
+      B:[
+        {n:'Rowing machine',eq:null,s:1,r:'8 min',rest:'—',note:'Uithoudingsvermogen tempo'},
+        {n:'Kettlebell Turkish get-up',eq:'kb',s:3,r:'4/zijde',rest:'60s',note:'Langzaam en gecontroleerd'},
+        {n:'Box jumps',eq:null,s:4,r:8,rest:'45s',note:'Zacht landen'},
+        {n:'Thrusters',eq:'db',s:3,r:12,rest:'45s',note:'Squat + press'},
+        {n:'Sled push',eq:null,s:3,r:'30s',rest:'60s',note:'Kracht uit de heupen'},
+        {n:'Battle ropes',eq:null,s:3,r:'30s',rest:'30s',note:'Rythmisch'},
+        {n:'Bulgarian split squat',eq:'db',s:3,r:'8/been',rest:'60s',note:'Achterbeen op bank'},
+        {n:'Mountain climbers',eq:'bw',s:3,r:'20 tot.',rest:'20s',note:'Snel'},
+        {n:'Dead bug',eq:'bw',s:3,r:'10/zijde',rest:'30s',note:'Core vast'},
+        {n:'Copenhagen plank',eq:null,s:2,r:'20s/zijde',rest:'30s',note:'Lichaam recht'},
+      ],
+    },
+    triathlon:{
+      A:[
+        {n:'Zwimmen',eq:null,s:1,r:'25 min',rest:'—',note:'Wissel stijl elke 4 minuten'},
+        {n:'Barbell squat',eq:'bb',s:3,r:10,rest:'60s',note:'Onderhoud kracht'},
+        {n:'Romanian deadlift',eq:'db',s:3,r:10,rest:'60s',note:'Hamstrings en rug'},
+        {n:'Overhead press',eq:'db',s:3,r:8,rest:'45s',note:'Bovenlichaam onderhouden'},
+        {n:'Bent-over row',eq:'db',s:3,r:10,rest:'45s',note:'Ellebogen langs romp'},
+        {n:'Walking lunges',eq:'db',s:3,r:'10/been',rest:'45s',note:'Gecontroleerd'},
+        {n:'Pull-ups',eq:'bw',s:3,r:6,rest:'60s',note:'Zwimspier ondersteuning'},
+        {n:'Kalf raises',eq:'db',s:3,r:15,rest:'30s',note:'Hardlopen ondersteuning'},
+        {n:'Rowing machine',eq:null,s:1,r:'5 min',rest:'—',note:'Conditioneel herstel'},
+        {n:'Dead bug',eq:'bw',s:3,r:'10/zijde',rest:'30s',note:'Core voor alle disciplines'},
+      ],
+      B:[
+        {n:'Stationary bike',eq:null,s:1,r:'30 min',rest:'—',note:'Constante cadentie, tempo opbouwen'},
+        {n:'Hardlopen',eq:null,s:1,r:'25 min',rest:'—',note:'Rustige pace, ritme houden'},
+        {n:'Bulgarian split squat',eq:'db',s:3,r:'8/been',rest:'60s',note:'Achterbeen op bank'},
+        {n:'Hip thrust',eq:'db',s:3,r:12,rest:'45s',note:'Knip bovenaan'},
+        {n:'Leg curl',eq:null,s:3,r:10,rest:'45s',note:'Langzaam terug'},
+        {n:'Shoulder lateral raise',eq:'db',s:3,r:12,rest:'30s',note:'Niet hoger dan schouders'},
+        {n:'Bicep curl',eq:'db',s:3,r:10,rest:'30s',note:'Langzaam'},
+        {n:'Tricep dips',eq:'bw',s:3,r:10,rest:'30s',note:'Ellebogen achteruit'},
+        {n:'Glute bridge',eq:'db',s:3,r:12,rest:'30s',note:'Knip bovenaan'},
+        {n:'Copenhagen plank',eq:null,s:2,r:'20s/zijde',rest:'30s',note:'Lichaam recht'},
+      ],
+    },
+    gymrace:{
+      A:[
+        {n:'Bankdrukken',eq:'bb',s:5,r:5,rest:'120s',note:'Competitie patroon — max kracht'},
+        {n:'Overhead press',eq:'bb',s:4,r:6,rest:'90s',note:'Staand, maximaal'},
+        {n:'Incline dumbbell press',eq:'db',s:3,r:10,rest:'60s',note:'Bank op 30-45 graden'},
+        {n:'Tricep dips',eq:'bw',s:3,r:10,rest:'45s',note:'Gewogen indien mogelijk'},
+        {n:'Shoulder lateral raise',eq:'db',s:4,r:12,rest:'30s',note:'Niet hoger dan schouders'},
+        {n:'Facepull',eq:null,s:3,r:15,rest:'30s',note:'Ellebogen hoog'},
+        {n:'Tricep overhead extension',eq:'db',s:3,r:10,rest:'30s',note:'Ellebogen vast'},
+        {n:'Cable fly',eq:null,s:3,r:12,rest:'30s',note:'Bovenaan samenknijpen'},
+        {n:'Plank',eq:'bw',s:3,r:'45s',rest:'30s',note:'Core vast'},
+        {n:'Dead bug',eq:'bw',s:3,r:'10/zijde',rest:'30s',note:'Rug plat'},
+      ],
+      B:[
+        {n:'Barbell squat',eq:'bb',s:5,r:5,rest:'120s',note:'Competitie — diepe squat'},
+        {n:'Deadlift',eq:'bb',s:3,r:5,rest:'120s',note:'Techniek is alles'},
+        {n:'Bent-over row',eq:'bb',s:4,r:8,rest:'60s',note:'Ellebogen langs romp'},
+        {n:'Pull-ups',eq:'bw',s:3,r:6,rest:'75s',note:'Volledig uit stretchen'},
+        {n:'Leg press',eq:null,s:4,r:10,rest:'60s',note:'Voeten midden-hoog'},
+        {n:'Romanian deadlift',eq:'bb',s:3,r:8,rest:'60s',note:'Hypertrofie blok'},
+        {n:'Leg curl',eq:null,s:3,r:10,rest:'45s',note:'Langzaam terug'},
+        {n:'Kalf raises',eq:null,s:4,r:15,rest:'30s',note:'Volledig uitstrekken'},
+        {n:'Bicep curl',eq:'db',s:3,r:10,rest:'30s',note:'Isolatie'},
+        {n:'Copenhagen plank',eq:null,s:2,r:'20s/zijde',rest:'30s',note:'Lichaam recht'},
+      ],
+    },
   };
+  return P[style]||P.fullbody;
+}
 
-  let exs = pools[style] || pools.fullbody;
+// ─── PROGRESSIVE OVERLOAD: week-for-week ───
+// Per blok (3 weken):
+//   Week 1: basis sets/reps
+//   Week 2: +2 reps bij hetzelfde gewicht
+//   Week 3: terug naar basis reps, maar gewicht verhogen
+function weekProg(ex, blokIdx){
+  // sets: +1 vanaf blok 2
+  const sets = Math.min(ex.s + (blokIdx > 0 ? 1 : 0), ex.s + 2);
+  const r = ex.r;
+  const isNum = typeof r === 'number';
+  const perBeen = typeof r === 'string' && r.includes('/been');
+  const perZijde = typeof r === 'string' && r.includes('/zijde');
+  const hasSec = typeof r === 'string' && r.includes('s') && !r.includes('min') && !r.includes('/');
+  const hasMin = typeof r === 'string' && r.includes('min');
+  const hasTot = typeof r === 'string' && r.includes('tot.');
+  const hasM = typeof r === 'string' && r.endsWith('m') && !r.includes('min');
 
-  // Adjust volume for level
-  if (isAdv) {
-    exs = exs.map(e => ({ ...e, sets: e.sets + 1 }));
+  let w2r = r, w2note = '+2 reps';
+  if(isNum){ w2r = r + 2; }
+  else if(perBeen){ const n=parseInt(r); w2r=(n+2)+'/been'; w2note='+2 reps/been'; }
+  else if(perZijde){
+    const n=parseInt(r);
+    if(r.includes('s')){ w2r=(n+10)+'s/zijde'; w2note='+10 sec/zijde'; }
+    else { w2r=(n+2)+'/zijde'; w2note='+2/zijde'; }
   }
+  else if(hasSec){ const n=parseInt(r); w2r=(n+10)+'s'; w2note='+10 sec'; }
+  else if(hasMin){ const n=parseInt(r); w2r=(n+5)+' min'; w2note='+5 min'; }
+  else if(hasTot){ const n=parseInt(r); w2r=(n+4)+' tot.'; w2note='+4 reps'; }
+  else if(hasM){ const n=parseInt(r); w2r=(n+10)+'m'; w2note='+10m'; }
+  else { w2note='Verhoog tempo'; }
 
-  return exs;
+  return [
+    { s:sets, r:r,   note: blokIdx===0 ? ex.note : 'Basis blok '+(blokIdx+1) },
+    { s:sets, r:w2r, note: w2note },
+    { s:sets, r:r,   note: 'Gewicht ↑ (terug naar basis reps)' }
+  ];
 }
 
-function getOverloadText(style) {
-  const texts = {
-    bbb: 'Dit schema gebruikt volume-progressie als hoofdmechanisme. In blok 1 leer je de bewegingen met lichte gewichten en vaste sets/reps. In blok 2 voegen we 1 extra set per oefening toe. In blok 3 verhogen we het gewicht en gaan we naar meer reps. Blok 4 bouwt op blok 3, maar week 12 is altijd een deload-week: volume daalt met 40% en gewicht met 20%.',
-    fullbody: 'De progressie hier draait om een combinatie van gewichtsverhoging en rep-progressie. Elke blok verhogen we het gewicht met 2.5–5% en voegen we 1–2 reps toe. De deload in week 12 zorgt ervoor dat je lichaam kan herstellen en de winsten vasthouden.',
-    split: 'Split-schema\'s profiteren van hogere frequentie per spiergroep per week. We progresseren via gewichtsverhoging in blok 1–2, en schakelen naar rep-progressie in blok 3–4. De deload week 12 is cruciaal om overtraining te voorkomen bij deze workload.',
-    'hybrid-strength': 'Dit schema alternert tussen kracht-blokken (zwaar, weinig reps, lange rust) en conditie-blokken (licht, veel reps, korte rust). De progressie in de kracht-oefeningen loopt via gewicht, terwijl de conditie-blokken progreneren op tijd en intensiteit.',
-    'hybrid-run': 'Kracht en hardlopen worden gecombineerd in 1 training. De kracht-oefeningen progreneren via gewicht en volume, terwijl de run-blokken progreneren op duur en intensiteit (meer intervalminuten, kortere rust). Week 12 is een lichte deload op beide fronten.',
-    crossfit: 'Circuit-gebaseerde progressie: in blok 1 leren we de bewegingen en bouwen we uithoudingsvermogen op. Blok 2 verhogen we het aantal reps en verkorten we de rust. Blok 3 verhogen we gewichten en voegen we complexiteit toe. Week 12 is een deload met nadruk op herstel.',
-    hyrox: 'Hyrox-training combineert functionele kracht met cardiovasculair uithoudingsvermogen. We progresseren via een mix van meer volume in de kracht-blokken en langere cardio-intervallen. De deload in week 12 is essentieel voor een Hyrox-body om overtraining te voorkomen.',
-    triathlon: 'Triathlon-training focust op multi-sport uithoudingsvermogen. De progressie loopt via langere duur in elke discipline en hogere intensiteit. Kracht-oefeningen ondersteunen de sportprestaties en progreneren via gewicht. Week 12 tapering zorgt voor optimale prestaties.',
-    gymrace: 'Gymrace-training draait om maximale kracht en explosieve prestaties. We gebruiken een periodisatie: blok 1 is opbouw (meer volume), blok 2 intensificatie (meer gewicht, minder reps), blok 3 peak (near-max inspanning), en week 12 is een zware deload voor herstel.'
+function getOverloadText(style){
+  const t={
+    bbb:'Dit schema bouwt week-voor-week op binnen elke blok. Week 1 is de basis — focus op juiste techniek. Week 2 verhogen we 2 reps bij hetzelfde gewicht. Week 3 gaan we terug naar de basis reps maar verhogen we het gewicht. Dit cyclus herhaalt zich per blok op een hogere basis. Week 12 is altijd een deload.',
+    fullbody:'Progressie per week: week 1 basis, week 2 meer reps bij hetzelfde gewicht, week 3 gewicht verhogen en terug naar basis reps. Elke nieuwe blok begint iets hoger. De deload in week 12 zorgt voor herstel en consolidatie.',
+    split:'Split-schema\'s hebben meer volume per spiergroep, dus de progressie is precies gepland: week 1 basis, week 2 +2 reps, week 3 gewicht verhogen. De deload week 12 voorkomt overtraining bij deze workload.',
+    'hybrid-strength':'Kracht-oefeningen progreneren via gewicht (week 3 van elke blok). Conditie-blokken progreneren via meer reps en kortere rust (week 2). De combinatie zorgt voor totale functionele opbouw.',
+    'hybrid-run':'Kracht-oefeningen progreneren via gewicht en reps. De hardloop-blokken progreneren via langere duur en hogere intensiteit in de intervallen. Week 12 is een lichte deload op beide fronten.',
+    crossfit:'Week 1 leren we de bewegingen, week 2 meer reps bij hetzelfde weerstand, week 3 hogere intensiteit of meer gewicht bij basis reps. De combinatie zorgt voor maximale resultaten.',
+    hyrox:'Week 1 basis, week 2 meer volume en langere cardio-intervallen bij dezelfde weerstand, week 3 hogere intensiteit bij basis reps. De deload in week 12 voorkomt overtraining.',
+    triathlon:'De duur van elke discipline verhogen we in week 2, terwijl de kracht-oefeningen progreneren via reps en gewicht. Week 3 is intensificatie bij basis duur.',
+    gymrace:'Week 1 opbouw volume bij basis gewicht, week 2 meer reps bij hetzelfde gewicht, week 3 gewicht verhogen bij basis reps. Dit cyclus herhaalt zich per blok op een hogere basis.'
   };
-  return texts[style] || texts.fullbody;
+  return t[style]||t.fullbody;
 }
-
-function getNutrition(goal) {
-  const texts = {
-    muscle: 'Om spieren op te bouwen, richt je op een lichte calorie-surplus (100–200 kcal boven onderhoud) met een eiwitinname van 1.6–2.0 gram per kilo lichaamsgewicht per dag. Verdeel dit over 3–4 maaltijden en kies voor volledige bronnen zoals kip, vis, eieren, kwark en peulvruchten. Carbhydraten zijn je brandstof voor de training — denk aan rijst, zoete aardappel en haverflakes.',
-    fat: 'Bij vet verbranden is een lichte calorie-deficit (200–300 kcal onder onderhoud) de sleutel. Hou je eiwitinname hoog — minimaal 1.8–2.2 gram per kilo — om spiermassa te behouden tijdens het vetverlies. Kies voor vezelarme groenten, mager eiwit en complexe carbhydraten als energiebron.',
-    endurance: 'Uithoudingsvermogen vraagt om een goede carbhydraat-inname voor brandstof, zeker rond de training. Richt je op 4–6 gram carbs per kilo lichaamsgewicht per dag en tankt op met rijst, brood en fruit. Eiwitinname blijft belangrijk op 1.4–1.8 gram per kilo voor herstel.',
-    all: 'Alles-in-een betekent een gebalanceerde benadering: onderhoud calorieën of een minimale surplus, eiwitinname van 1.6–2.0 gram per kilo, en een mix van complexe carbs en gesunde vetten. Focus op hele voedingsproducten en hydratatie — water is onderschat bij samengestelde trainingen.'
+function getNutrition(goal){
+  const t={
+    muscle:'Om spieren op te bouwen, richt je op een lichte calorie-surplus (100–200 kcal boven onderhoud) met een eiwitinname van 1.6–2.0 gram per kilo lichaamsgewicht per dag. Verdeel over 3–4 maaltijden: kip, vis, eieren, kwark en peulvruchten. Carbhydraten als brandstof — rijst, zoete aardappel, haverflakes.',
+    fat:'Bij vet verbranden is een lichte calorie-deficit (200–300 kcal onder onderhoud) de sleutel. Hou eiwitinname hoog — minimaal 1.8–2.2 gram per kilo — om spiermassa te behouden. Kies voor vezelarme groenten, mager eiwit en complexe carbhydraten.',
+    endurance:'Uithoudingsvermogen vraagt om een goede carbhydraat-inname, zeker rond de training. Richt je op 4–6 gram carbs per kilo per dag — rijst, brood, fruit. Eiwitinname blijft belangrijk op 1.4–1.8 gram per kilo voor herstel.',
+    all:'Alles-in-een: onderhoud calorieën of minimale surplus, eiwitinname 1.6–2.0 gram per kilo, mix van complexe carbs en gesunde vetten. Focus op hele voedingsproducten en goede hydratatie.'
   };
-  return texts[goal];
+  return t[goal];
 }
-
-function getWarmup(style) {
-  const warmups = {
-    bbb: { activities: '2 min licht joggen op de plaats → 1 min hip circles → 1 min bodyweight squats (zonder gewicht) → 1 min beenswingen vooruit en achteruit per been.' },
-    fullbody: { activities: '2 min licht joggen → 30 sec arm circles → 1 min bodyweight squats → 30 sec hip hinges → 1 min jumping jacks.' },
-    split: { activities: 'Upper: 2 min joggen → 1 min arm circles → 30 sec push-ups (half) → 1 min schouder rotaties. Lower: 2 min joggen → 1 min hip circles → 1 min bodyweight squats → 30 sec lunges.' },
-    'hybrid-strength': { activities: '3 min licht joggen → 1 min jumping jacks → 30 sec burpees (langzaam) → 1 min dynamische stretching (hips en schouders).' },
-    'hybrid-run': { activities: '5 min rustige jog → 1 min hip circles → 30 sec bodyweight squats → 30 sec lunges per been.' },
-    crossfit: { activities: '3 min joggen → 10 air squats → 10 inchworms → 10 hip hinges → 5 burpees (langzaam tempo).' },
-    hyrox: { activities: '3 min rowing machine (rustig) → 10 bodyweight squats → 10 lunges → 10 kettlebell swings (leeg of licht).' },
-    triathlon: { activities: '5 min licht joggen of fietsen → 1 min dynamische stretching → 30 sec jumping jacks → 30 sec schouder rotaties.' },
-    gymrace: { activities: '5 min joggen → 10 bodyweight squats → 5 push-ups → 10 hip hinges → licht opwarmen met het gewicht dat je gaat gebruiken.' }
+function getWarmup(style){
+  const w={
+    bbb:'2 min licht joggen → 1 min hip circles → 1 min bodyweight squats → 1 min beenswingen vooruit/achteruit → 30 sec inchworms → 30 sec dynamische hamstring stretch.',
+    fullbody:'2 min joggen → 30 sec arm circles → 1 min bodyweight squats → 30 sec hip hinges → 1 min jumping jacks → 30 sec inchworms.',
+    split:'Upper: 2 min joggen → 1 min arm circles → 30 sec half push-ups → 1 min schouder rotaties. Lower: 2 min joggen → 1 min hip circles → 1 min bodyweight squats → 30 sec lunges.',
+    'hybrid-strength':'3 min licht joggen → 10 jumping jacks → 10 bodyweight squats → 10 hip hinges → 5 burpees (langzaam tempo) → 30 sec dynamische stretching.',
+    'hybrid-run':'5 min rustige jog → 1 min hip circles → 10 bodyweight squats → 10 lunges (5/been) → 30 sec arm circles.',
+    crossfit:'3 min joggen → 10 air squats → 10 inchworms → 10 hip hinges → 5 burpees (langzaam) → 30 sec schouder rotaties.',
+    hyrox:'3 min rowing machine (rustig) → 10 bodyweight squats → 10 lunges → 10 kettlebell swings (leeg) → 30 sec hip circles.',
+    triathlon:'5 min licht joggen of fietsen → 1 min dynamische stretching (hips + schouders) → 10 air squats → 30 sec arm circles.',
+    gymrace:'5 min joggen → 10 bodyweight squats → 5 push-ups → 10 hip hinges → licht opwarmen met het gewicht → 30 sec schouder rotaties.'
   };
-  return warmups[style] || warmups.fullbody;
+  return w[style]||w.fullbody;
 }
 
-function getCooldown(style) {
-  return '2 min wandelen → 1 min quad stretch per been → 1 min hamstring stretch per been → 1 min glute stretch (figuur-4) → 2 min diepe adem (in 4 tel, uit 6 tel).';
-}
-
-// ─── SCHEMA GENERATION ───
-function generateSchema() {
+// ─── GENERATE ───
+function generate(){
   document.getElementById('loading').classList.add('active');
+  setTimeout(()=>{
+    const freq=parseInt(ans[0]), style=ans[1], goal=ans[2], level=ans[3];
+    const pool=getPool(style,level);
+    const dayKeys=Object.keys(pool);
 
-  setTimeout(() => {
-    const freq = parseInt(answers[0]);
-    const style = answers[1];
-    const goal = answers[2];
-    const level = answers[3];
-
-    const exercises = getExercises(style, level, goal);
-    const daysPerWeek = freq;
-
-    // Distribute exercises across days
-    const days = [];
-    const exPerDay = Math.ceil(exercises.length / daysPerWeek);
-
-    for (let d = 0; d < daysPerWeek; d++) {
-      const dayExercises = exercises.slice(d * exPerDay, (d + 1) * exPerDay);
-      if (dayExercises.length > 0) {
-        let dayName = 'Dag ' + String.fromCharCode(65 + d); // Dag A, B, C...
-        if (style === 'split' && daysPerWeek >= 4) {
-          dayName = d % 2 === 0 ? 'Upper ' + (Math.floor(d/2)+1) : 'Lower ' + (Math.floor(d/2)+1);
-        }
-        days.push({ name: dayName, exercises: dayExercises });
-      }
+    // Build days to match frequency (cycle through available day templates)
+    const days=[];
+    for(let i=0;i<freq;i++){
+      const key=dayKeys[i%dayKeys.length];
+      days.push({name:'Dag '+String.fromCharCode(65+i), exs:pool[key]});
     }
 
-    // Build blocks with progression
-    const blocks = [
-      { name: 'Blok 1', weeks: 'Week 1–3', action: 'Basis volume', setMod: 0, repMod: 0, weightNote: 'Start gewicht' },
-      { name: 'Blok 2', weeks: 'Week 4–6', action: '+1 Set', setMod: 1, repMod: 0, weightNote: 'Zelfde gewicht' },
-      { name: 'Blok 3', weeks: 'Week 7–9', action: 'Gewicht ↑', setMod: 1, repMod: 2, weightNote: 'Gewicht verhogen' },
-      { name: 'Blok 4', weeks: 'Week 10–11', action: 'Peak', setMod: 1, repMod: 4, weightNote: 'Maximale inspanning' },
+    const blocks=[
+      {name:'Blok 1',weeks:'Week 1–3',action:'Basis volume'},
+      {name:'Blok 2',weeks:'Week 4–6',action:'+1 Set | Meer reps'},
+      {name:'Blok 3',weeks:'Week 7–9',action:'Gewicht ↑'},
+      {name:'Blok 4',weeks:'Week 10–11',action:'Peak intensiteit'},
     ];
 
-    // Render
-    let html = '';
+    let h='';
 
     // Title
-    html += `
-    <div class="result-title-block">
-      <div class="brand">Academy Overgewicht — 12 Weken Programma</div>
-      <h2>${styleNames[style]}</h2>
-      <div class="tags">
-        <span class="tag">${freq}x per week</span>
-        <span class="tag">${goalNames[goal]}</span>
-        <span class="tag">${levelNames[level]}</span>
-      </div>
+    h+=`<div class="result-title-block">
+      <div class="brand">Academie over Gewicht — 12 Weken Programma</div>
+      <h2>${SN[style]}</h2>
+      <div class="tags"><span class="tag">${freq}x per week</span><span class="tag">${GN[goal]}</span><span class="tag">${LN[level]}</span></div>
     </div>`;
 
-    // Overload
-    html += `
-    <div class="section">
+    // Overload strategy
+    h+=`<div class="section">
       <div class="section-title"><span class="icon">📈</span> Overload-Strategie</div>
       <div class="section-divider"></div>
       <p class="overload-text">${getOverloadText(style)}</p>
       <div class="blok-row">`;
-    blocks.forEach(b => {
-      html += `<div class="blok-card"><div class="blok-name">${b.name}</div><div class="blok-weeks">${b.weeks}</div><div class="blok-action">${b.action}</div></div>`;
-    });
-    html += `</div></div>`;
+    blocks.forEach(b=>h+=`<div class="blok-card"><div class="blok-name">${b.name}</div><div class="blok-weeks">${b.weeks}</div><div class="blok-action">${b.action}</div></div>`);
+    h+=`</div></div>`;
 
     // Schema per blok
-    blocks.forEach((blok, bIdx) => {
-      html += `
-      <div class="section schema-block">
+    blocks.forEach((blok,bIdx)=>{
+      h+=`<div class="section schema-block">
         <div class="section-title"><span class="icon">📋</span> ${blok.name} <span class="week-badge">${blok.weeks}</span></div>
         <div class="section-divider"></div>`;
 
-      days.forEach(day => {
-        html += `
-        <div class="schema-block-title">${day.name} <span class="week-badge">${blok.weightNote}</span></div>
-        <table class="schema-table">
-          <thead>
-            <tr>
-              <th style="width:50px">Dag</th>
-              <th>Oefening</th>
-              <th style="width:50px">Sets</th>
-              <th style="width:55px">Reps</th>
-              <th style="width:50px">Rust</th>
-              <th>Notitie</th>
-            </tr>
-          </thead>
-          <tbody>`;
+      days.forEach(day=>{
+        h+=`<div class="schema-block-title">${day.name}</div>
+        <table class="schema-table"><thead><tr>
+          <th style="width:48px">Week</th>
+          <th>Oefening</th>
+          <th style="width:38px">Sets</th>
+          <th style="width:50px">Reps</th>
+          <th style="width:40px">Rust</th>
+          <th>Progressie / Notitie</th>
+        </tr></thead><tbody>`;
 
-        day.exercises.forEach(ex => {
-          const sets = ex.sets + blok.setMod;
-          // For numeric reps, add repMod
-          let reps = ex.reps;
-          const numReps = parseInt(ex.reps);
-          if (!isNaN(numReps) && !ex.reps.includes('per been') && !ex.reps.includes('sec') && !ex.reps.includes('min') && !ex.reps.includes('total') && !ex.reps.includes('m')) {
-            reps = String(numReps + blok.repMod);
-          }
-
-          html += `
-            <tr>
-              <td class="day-cell">${day.name}</td>
-              <td>${ex.name}</td>
-              <td>${sets}</td>
-              <td>${reps}</td>
+        day.exs.forEach((ex,idx)=>{
+          if(idx>0) h+=`<tr class="ex-sep"><td colspan="6">─ ─ ─</td></tr>`;
+          const weeks=weekProg(ex,bIdx);
+          weeks.forEach((w,wIdx)=>{
+            const wNum=bIdx*3+wIdx+1;
+            h+=`<tr>
+              <td class="w-cell">W${wNum}</td>
+              <td>${ex.n} ${eqBadge(ex.eq)}</td>
+              <td>${w.s}</td>
+              <td>${w.r}</td>
               <td>${ex.rest}</td>
-              <td class="note-cell">${bIdx === 0 ? ex.note : (bIdx === 1 ? '+1 set' : bIdx === 2 ? 'Gewicht ↑' : 'Peak')}</td>
+              <td class="note-cell">${w.note}</td>
             </tr>`;
+          });
         });
-
-        html += `</tbody></table><br>`;
+        h+=`</tbody></table>`;
       });
-
-      html += `</div>`;
+      h+=`</div>`;
     });
 
     // Deload week 12
-    html += `
-    <div class="section schema-block">
+    h+=`<div class="section schema-block">
       <div class="section-title"><span class="icon">⚡</span> Deload Week <span class="week-badge">Week 12</span></div>
       <div class="section-divider"></div>`;
-
-    days.forEach(day => {
-      html += `
-      <div class="schema-block-title">${day.name} <span class="week-badge">Volume -40% | Gewicht -20%</span></div>
-      <table class="schema-table">
-        <thead><tr><th style="width:50px">Dag</th><th>Oefening</th><th style="width:50px">Sets</th><th style="width:55px">Reps</th><th style="width:50px">Rust</th><th>Notitie</th></tr></thead>
-        <tbody>`;
-
-      day.exercises.forEach(ex => {
-        const deloadSets = Math.max(1, Math.round(ex.sets * 0.6));
-        let reps = ex.reps;
-        const numReps = parseInt(ex.reps);
-        if (!isNaN(numReps) && !ex.reps.includes('per been') && !ex.reps.includes('sec') && !ex.reps.includes('min') && !ex.reps.includes('total') && !ex.reps.includes('m')) {
-          reps = String(Math.max(4, Math.round(numReps * 0.8)));
+    days.forEach(day=>{
+      h+=`<div class="schema-block-title">${day.name} <span class="week-badge">Volume -40% | Gewicht -20%</span></div>
+      <table class="schema-table"><thead><tr>
+        <th style="width:48px">Week</th><th>Oefening</th><th style="width:38px">Sets</th><th style="width:50px">Reps</th><th style="width:40px">Rust</th><th>Notitie</th>
+      </tr></thead><tbody>`;
+      day.exs.forEach((ex,idx)=>{
+        if(idx>0) h+=`<tr class="ex-sep"><td colspan="6">─ ─ ─</td></tr>`;
+        const ds=Math.max(1,Math.round(ex.s*0.6));
+        let dr=ex.r;
+        if(typeof dr==='number') dr=Math.max(4,Math.round(dr*0.8));
+        else if(typeof dr==='string'){
+          const n=parseInt(dr);
+          if(!isNaN(n)){
+            if(dr.includes('/been')) dr=Math.max(4,Math.round(n*0.8))+'/been';
+            else if(dr.includes('/zijde')){ if(dr.includes('s')) dr=Math.max(10,Math.round(n*0.7))+'s/zijde'; else dr=Math.max(4,Math.round(n*0.8))+'/zijde'; }
+            else if(dr.includes('s')&&!dr.includes('min')) dr=Math.max(15,Math.round(n*0.7))+'s';
+            else if(dr.includes('min')) dr=Math.max(3,Math.round(n*0.7))+' min';
+            else if(dr.includes('tot.')) dr=Math.max(8,Math.round(n*0.7))+' tot.';
+            else if(dr.endsWith('m')) dr=Math.max(25,Math.round(n*0.7))+'m';
+          }
         }
-
-        html += `
-          <tr>
-            <td class="day-cell">${day.name}</td>
-            <td>${ex.name}</td>
-            <td>${deloadSets}</td>
-            <td>${reps}</td>
-            <td>${ex.rest}</td>
-            <td class="note-cell">Deload — licht gewicht, focus op gevoel</td>
-          </tr>`;
+        h+=`<tr><td class="w-cell">W12</td><td>${ex.n} ${eqBadge(ex.eq)}</td><td>${ds}</td><td>${dr}</td><td>${ex.rest}</td><td class="note-cell">Deload — licht gewicht, focus op herstel</td></tr>`;
       });
-
-      html += `</tbody></table><br>`;
+      h+=`</tbody></table>`;
     });
-    html += `</div>`;
+    h+=`</div>`;
 
-    // Warmup & Cooldown
-    html += `
-    <div class="section">
+    // Warmup & cooldown
+    h+=`<div class="section">
       <div class="section-title"><span class="icon">🔥</span> Warmup & Cool-Down</div>
       <div class="section-divider"></div>
-      <div class="warmup-row">
-        <div class="warmup-phase"><div class="phase-name">Warmup</div><div class="phase-dur">5–8 min</div></div>
-        <div class="warmup-activities">${getWarmup(style).activities}</div>
-      </div>
-      <br>
-      <div class="warmup-row">
-        <div class="warmup-phase"><div class="phase-name">Cool-Down</div><div class="phase-dur">7–10 min</div></div>
-        <div class="warmup-activities">${getCooldown(style)}</div>
-      </div>
+      <div class="warmup-row"><div class="warmup-phase"><div class="phase-name">Warmup</div><div class="phase-dur">7–8 min</div></div><div class="warmup-activities">${getWarmup(style)}</div></div><br>
+      <div class="warmup-row"><div class="warmup-phase"><div class="phase-name">Cool-Down</div><div class="phase-dur">7–8 min</div></div><div class="warmup-activities">2 min wandelen → 1 min quad stretch per been → 1 min hamstring stretch per been → 1 min glute stretch (figuur-4) → 1 min schouder stretch per zijde → 1 min diepe adem (in 4 tel, uit 6 tel).</div></div>
     </div>`;
 
     // Nutrition
-    html += `
-    <div class="section">
+    h+=`<div class="section">
       <div class="section-title"><span class="icon">🥗</span> Voeding-Snapshot</div>
       <div class="section-divider"></div>
       <div class="nutrition-box">${getNutrition(goal)}</div>
     </div>`;
 
-    document.getElementById('result-content').innerHTML = html;
+    // ─── GEWICHTSLOG (print-optimized) ───
+    h+=`<div class="section log-section">
+      <div class="section-title"><span class="icon">📝</span> Gewichtslog</div>
+      <div class="section-divider"></div>
+      <p class="log-hint">Print deze pagina af en log je gebruikte gewichten na elke training. Dit helpt je om de juiste progressie te volgen en terug te kijken naar eerdere sessies.</p>`;
+
+    days.forEach(day=>{
+      h+=`<div class="schema-block-title">${day.name}</div>
+      <table class="log-table"><thead>
+        <tr class="log-blok-header">
+          <th></th>
+          <th colspan="3">Blok 1</th>
+          <th colspan="3">Blok 2</th>
+          <th colspan="3">Blok 3</th>
+          <th colspan="2">Blok 4</th>
+          <th>DL</th>
+        </tr>
+        <tr>
+          <th>Oefening</th>`;
+      for(let w=1;w<=12;w++) h+=`<th>W${w}</th>`;
+      h+=`</tr></thead><tbody>`;
+
+      day.exs.forEach(ex=>{
+        h+=`<tr><td>${ex.n} ${eqBadge(ex.eq)}</td>`;
+        for(let w=1;w<=12;w++) h+=`<td class="log-cell"></td>`;
+        h+=`</tr>`;
+      });
+      h+=`</tbody></table>`;
+    });
+    h+=`</div>`;
+
+    document.getElementById('result-content').innerHTML=h;
     document.getElementById('loading').classList.remove('active');
     document.getElementById('quiz-screen').classList.remove('active');
     document.getElementById('result-screen').classList.add('active');
-    window.scrollTo(0, 0);
-
-  }, 1200);
-}
-
-// ─── PDF DOWNLOAD ───
-function downloadPDF() {
-  window.print();
+    window.scrollTo(0,0);
+  },1200);
 }
 </script>
 </body>
