@@ -77,6 +77,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .blok-card .blok-action{font-size:13px;font-weight:500}
 
 .schema-block-title{font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.week-group{margin-bottom:8px}
+.week-header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);border-radius:6px;margin:16px 0 12px}
 .week-badge{background:var(--gold-dim);border:1px solid var(--border);padding:3px 10px;border-radius:12px;font-size:11px;color:var(--gold-light)}
 
 .schema-table{width:100%;border-collapse:collapse;border-radius:10px;overflow:hidden;border:1px solid var(--border);margin-bottom:20px}
@@ -84,29 +86,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .schema-table td{padding:9px 8px;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.04)}
 .schema-table tr:last-child td{border-bottom:none}
 .schema-table tr:hover td{background:rgba(201,168,76,0.03)}
-.w-cell{font-weight:600;color:var(--gold-light);font-size:11px;white-space:nowrap}
 .note-cell{color:var(--gray-light);font-size:11px;font-style:italic}
 .eq-badge{display:inline-block;font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:rgba(201,168,76,0.12);color:var(--gold);margin-left:3px}
-.ex-sep{background:rgba(201,168,76,0.05)}
-.ex-sep td{padding:4px 8px;font-size:9px;color:var(--gray);border-bottom:1px solid rgba(201,168,76,0.08)!important}
 
-.warmup-row{display:grid;grid-template-columns:110px 1fr;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px}
-.warmup-phase{background:var(--card-bg);padding:20px 16px;border-right:1px solid var(--border)}
-.warmup-phase .phase-name{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
-.warmup-phase .phase-dur{font-size:12px;color:var(--gray-light)}
-.warmup-activities{padding:20px 18px;font-size:13px;color:var(--gray-light);line-height:1.8}
 .nutrition-box{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:24px;font-size:14px;color:var(--gray-light);line-height:1.8;font-weight:300}
-
-/* Weight Log */
-.log-hint{font-size:13px;color:var(--gray-light);margin-bottom:20px;font-weight:300}
-.log-table{width:100%;border-collapse:collapse;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:28px}
-.log-table th{background:rgba(201,168,76,0.08);color:var(--gold);font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:8px 3px;text-align:center;border-bottom:1px solid var(--border);border-right:1px solid rgba(201,168,76,0.1)}
-.log-table th:first-child{text-align:left;padding-left:10px;width:180px}
-.log-table td{padding:7px 3px;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.04);border-right:1px solid rgba(255,255,255,0.04);text-align:center}
-.log-table td:first-child{text-align:left;padding-left:10px;font-weight:500;font-size:12px}
-.log-table tr:last-child td{border-bottom:none}
-.log-cell{min-height:26px;background:rgba(201,168,76,0.03)}
-.log-blok-header th{background:rgba(201,168,76,0.1)!important;color:var(--gold-light)!important;font-size:8px!important;letter-spacing:1px}
 
 .loading-overlay{display:none;position:fixed;inset:0;background:rgba(10,10,10,0.85);z-index:100;justify-content:center;align-items:center;flex-direction:column;gap:16px}
 .loading-overlay.active{display:flex}
@@ -128,46 +111,24 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   .section-title{color:#111}
   .section-title .icon{color:#c9a84c}
   .section-divider{background:linear-gradient(90deg,#c9a84c,transparent)}
-  .overload-text,.log-hint{color:#555}
+  .overload-text{color:#555}
   .blok-card{border-color:#ddd;background:#fafafa}
   .blok-card .blok-name{color:#c9a84c}
-  .blok-card .blok-weeks{color:#999}
-  .blok-card .blok-action{color:#111}
   .schema-block-title{color:#c9a84c}
   .week-badge{background:#faf3e0;border-color:#c9a84c;color:#b8943e}
   .schema-table{border-color:#ddd}
   .schema-table th{background:#faf3e0;color:#c9a84c;border-bottom-color:#ddd}
   .schema-table td{color:#222;border-bottom-color:#eee}
-  .w-cell{color:#c9a84c}
   .note-cell{color:#888}
   .eq-badge{background:#faf3e0;color:#c9a84c}
-  .ex-sep{background:#f5f0e8!important}
-  .ex-sep td{color:#999!important;border-bottom-color:#e0d5c0!important}
-  .warmup-row{border-color:#ddd}
-  .warmup-phase{background:#fafafa;border-right-color:#ddd}
-  .warmup-phase .phase-name{color:#c9a84c}
-  .warmup-phase .phase-dur{color:#999}
-  .warmup-activities{color:#555}
   .nutrition-box{background:#fafafa;border-color:#ddd;color:#555}
-  .log-table{border-color:#ddd}
-  .log-table th{background:#faf3e0;color:#c9a84c;border-right-color:#e0d5c0;border-bottom-color:#ddd}
-  .log-table td{color:#222;border-bottom-color:#eee;border-right-color:#eee}
-  .log-cell{background:#fff;border:1px solid #ccc}
-  .log-blok-header th{background:#f0e8d8!important;color:#c9a84c!important}
   .schema-block{page-break-inside:avoid}
   .log-section{page-break-before:always}
-}
-@media(max-width:600px){
-  .quiz-header h1{font-size:30px}
-  .blok-row{grid-template-columns:repeat(2,1fr)}
-  .result-content{padding:32px 16px 60px}
-  .result-header{padding:16px;flex-wrap:wrap;gap:8px}
 }
 </style>
 </head>
 <body>
 
-<!-- QUIZ -->
 <div id="quiz-screen" class="screen active">
 <div class="quiz-container">
 <div class="quiz-header">
@@ -194,475 +155,26 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </div>
 
 <div class="question-block" id="q1">
-  <div class="question-label">Vraag 2 van 4</div>
+  <div class="question-label" id="q1-label">Vraag 2 van 4</div>
   <div class="question-text">Welke trainingsstijl past best bij jou?</div>
   <div class="options">
     <div class="option" data-q="1" data-val="bbb"><div class="option-icon">🍑</div><div><div class="option-text">BBB Focus</div><div class="option-sub">Glutes & Benen als hoofddoel</div></div></div>
     <div class="option" data-q="1" data-val="fullbody"><div class="option-icon">💪</div><div><div class="option-text">Fullbody</div><div class="option-sub">Alles in één training</div></div></div>
     <div class="option" data-q="1" data-val="split"><div class="option-icon">🔀</div><div><div class="option-text">Split Schema</div><div class="option-sub">Upper / Lower verdeling</div></div></div>
-    <div class="option" data-q="1" data-val="hybrid-strength"><div class="option-icon">⚡</div><div><div class="option-text">Hybrid Strength</div><div class="option-sub">Kracht + Conditie combo</div></div></div>
     <div class="option" data-q="1" data-val="hybrid-run"><div class="option-icon">🏃</div><div><div class="option-text">Hybrid Run</div><div class="option-sub">Kracht + Hardlopen</div></div></div>
-    <div class="option" data-q="1" data-val="crossfit"><div class="option-icon">🔥</div><div><div class="option-text">CrossFit / Circuit</div><div class="option-sub">High intensity, korte rust</div></div></div>
-    <div class="option" data-q="1" data-val="hyrox"><div class="option-icon">🏅</div><div><div class="option-text">Hyrox</div><div class="option-sub">Functionele kracht + uithoudingsvermogen</div></div></div>
-    <div class="option" data-q="1" data-val="triathlon"><div class="option-icon">🥇</div><div><div class="option-text">Triathlon</div><div class="option-sub">Zwimmen + Fietsen + Hardlopen</div></div></div>
-    <div class="option" data-q="1" data-val="gymrace"><div class="option-icon">🏋️</div><div><div class="option-text">Gymrace</div><div class="option-sub">Competitieve gym prestaties</div></div></div>
+    <div class="option" data-q="1" data-val="hardlopen"><div class="option-icon">👟</div><div><div class="option-text">Hardlopen (Focus)</div><div class="option-sub">Ren-schema met kracht support</div></div></div>
   </div>
 </div>
 
 <div class="question-block" id="q2">
-  <div class="question-label">Vraag 3 van 4</div>
-  <div class="question-text">Wat is jouw hoofddoel?</div>
+  <div class="question-label" id="q2-label">Vraag 3 van 5</div>
+  <div class="question-text">Wat is jouw <span style="color:var(--gold)">doelafstand</span>?</div>
   <div class="options">
-    <div class="option" data-q="2" data-val="muscle"><div class="option-icon">💪</div><div><div class="option-text">Spieren opbouwen</div><div class="option-sub">Meer massa & sterkte</div></div></div>
-    <div class="option" data-q="2" data-val="fat"><div class="option-icon">🔥</div><div><div class="option-text">Vet verbranden</div><div class="option-sub">Body recomposition</div></div></div>
-    <div class="option" data-q="2" data-val="endurance"><div class="option-icon">❤️</div><div><div class="option-text">Uithoudingsvermogen</div><div class="option-sub">Meer energie & conditie</div></div></div>
-    <div class="option" data-q="2" data-val="all"><div class="option-icon">⭐</div><div><div class="option-text">Alles-in-een</div><div class="option-sub">Gebalanceerd totaal pakket</div></div></div>
+    <div class="option" data-q="2" data-val="5"><div class="option-icon">🏳️</div><div><div class="option-text">5 km</div><div class="option-sub">Ideaal voor beginners</div></div></div>
+    <div class="option" data-q="2" data-val="10"><div class="option-icon">🏳️</div><div><div class="option-text">10 km</div><div class="option-sub">Populaire wedstrijdafstand</div></div></div>
+    <div class="option" data-q="2" data-val="21"><div class="option-icon">🏳️</div><div><div class="option-text">21 km</div><div class="option-sub">Half marathon</div></div></div>
   </div>
 </div>
 
 <div class="question-block" id="q3">
-  <div class="question-label">Vraag 4 van 4</div>
-  <div class="question-text">Wat is jouw ervaringsniveau?</div>
-  <div class="options">
-    <div class="option" data-q="3" data-val="beginner"><div class="option-icon">🌱</div><div><div class="option-text">Beginner</div><div class="option-sub">Minder dan 1 jaar ervaring</div></div></div>
-    <div class="option" data-q="3" data-val="gevorderd"><div class="option-icon">🌿</div><div><div class="option-text">Gevorderd</div><div class="option-sub">1–3 jaar ervaring</div></div></div>
-    <div class="option" data-q="3" data-val="geavanceerd"><div class="option-icon">🌳</div><div><div class="option-text">Geavanceerd</div><div class="option-sub">3+ jaar ervaring</div></div></div>
-  </div>
-</div>
-
-<div class="quiz-nav">
-  <button class="btn btn-back" id="btn-back" onclick="prevQ()" style="visibility:hidden">Terug</button>
-  <button class="btn btn-next" id="btn-next" onclick="nextQ()" disabled>Volgende →</button>
-</div>
-</div>
-</div>
-
-<!-- RESULT -->
-<div id="result-screen" class="screen">
-  <div class="result-header">
-    <div class="brand-small">Academie over Gewicht</div>
-    <div class="actions">
-      <button class="btn-restart" onclick="restart()">↩ Opnieuw</button>
-      <button class="btn-pdf" onclick="window.print()">⬇ Download PDF</button>
-    </div>
-  </div>
-  <div class="result-content" id="result-content"></div>
-</div>
-
-<div class="loading-overlay" id="loading"><div class="loader"></div><p>Schema wordt gegenereerd...</p></div>
-
-<script>
-<script>
-// ─── QUIZ FLOW & UI ───
-// Q0=frequentie, Q1=stijl, Q2=afstand(hardlopen), Q3=doel, Q4=niveau
-let flow = [0,1,3,4];
-let flowIdx = 0;
-const ans = {0:null,1:null,2:null,3:null,4:null};
-
-function curQ(){ return flow[flowIdx]; }
-function isLastQ(){ return flowIdx === flow.length-1; }
-
-function rebuildFlow(){
-  // Als hardlopen gekozen is, voeg de afstandsvraag toe
-  if(ans[1]==='hardlopen') flow=[0,1,2,3,4];
-  else flow=[0,1,3,4];
-  
-  // Update labels
-  const total=flow.length;
-  flow.forEach((qId,idx)=>{
-    const lbl=document.getElementById('q'+qId+'-label');
-    if(lbl) lbl.textContent='Vraag '+(idx+1)+' van '+total;
-  });
-}
-
-document.querySelectorAll('.option').forEach(o=>{
-  o.addEventListener('click',function(){
-    const q=parseInt(this.dataset.q);
-    // Visuele selectie
-    document.querySelectorAll('.option[data-q="'+q+'"]').forEach(function(x){x.classList.remove('selected')});
-    this.classList.add('selected');
-    
-    // Data opslaan
-    ans[q]=this.dataset.val;
-    document.getElementById('btn-next').disabled=false;
-    
-    // Logica update voor hardlopen
-    if(q===1) rebuildFlow();
-  });
-});
-
-function updProg(){
-  const dotIdx = Math.min(flowIdx, 3);
-  for(var i=0;i<4;i++) document.getElementById('dot-'+i).classList.toggle('filled',i<=dotIdx);
-  document.getElementById('btn-back').style.visibility=flowIdx===0?'hidden':'visible';
-  document.getElementById('btn-next').textContent=isLastQ()?'Genereer Schema →':'Volgende →';
-  document.getElementById('btn-next').disabled=ans[curQ()]===null;
-}
-
-function showQ(qId){
-  document.querySelectorAll('.question-block').forEach(function(q){q.classList.remove('active')});
-  document.getElementById('q'+qId).classList.add('active');
-  updProg();
-}
-
-function nextQ(){if(ans[curQ()]===null)return;if(isLastQ())generate();else{flowIdx++;showQ(curQ())}}
-function prevQ(){if(flowIdx>0){flowIdx--;showQ(curQ())}}
-
-function restart(){
-  flowIdx=0;flow=[0,1,3,4];
-  [0,1,2,3,4].forEach(function(k){ans[k]=null});
-  document.querySelectorAll('.option').forEach(function(o){o.classList.remove('selected')});
-  document.getElementById('btn-next').disabled=true;
-  document.getElementById('quiz-screen').classList.add('active');
-  document.getElementById('result-screen').classList.remove('active');
-  showQ(0);
-}
-showQ(0);
-
-// ─── DATA & LOGIC ───
-
-// Naming helpers
-const SN={bbb:'BBB Focus (Glutes & Legs)',fullbody:'Fullbody Strength & Shape',split:'Upper / Lower Split','hybrid-strength':'Hybrid Strength (Functional)', 'hybrid-run':'Hybrid Runner Protocol', crossfit:'Metcon / CrossFit Style', hyrox:'Hyrox Competition Prep', triathlon:'Triathlon Base', gymrace:'Gymrace Competitive', hardlopen:'Runner Support'};
-const GN={muscle:'Hypertrofie (Spiermassa)', fat:'Fat Loss & Toning', endurance:'Uithoudingsvermogen', all:'General Fitness'};
-const LN={beginner:'Beginner', gevorderd:'Gevorderd', geavanceerd:'Expert'};
-
-function eqBadge(eq){
-  if(!eq)return '';
-  const m={bb:'Barbell',db:'Dumbbell',kb:'Kettlebell',bw:'Bodyweight',mc:'Machine',c:'Cardio'};
-  return '<span class="eq-badge">'+(m[eq]||eq)+'</span>';
-}
-
-// ─── 1. CORE EXERCISE LIBRARY ───
-// Hier definiëren we de oefeningen met hun standaard eigenschappen
-function getExercise(name, type) {
-    // Type: compound, isolation, core, cardio
-    const db = {
-        // LEGS (Knee)
-        'squat_bb': {n:'Back Squat', eq:'bb', type:'compound'},
-        'squat_goblet': {n:'Goblet Squat', eq:'db', type:'compound'},
-        'lunge_walking': {n:'Walking Lunges', eq:'db', type:'compound'},
-        'split_squat': {n:'Bulgarian Split Squat', eq:'db', type:'compound'},
-        'leg_press': {n:'Leg Press', eq:'mc', type:'compound'},
-        'step_up': {n:'Box Step Ups', eq:'db', type:'compound'},
-        
-        // LEGS (Hinge/Glute)
-        'deadlift_bb': {n:'Deadlift', eq:'bb', type:'compound'},
-        'rdl_db': {n:'Romanian Deadlift', eq:'db', type:'compound'},
-        'rdl_bb': {n:'Romanian Deadlift', eq:'bb', type:'compound'},
-        'hip_thrust': {n:'Hip Thrust', eq:'bb', type:'compound'},
-        'glute_bridge': {n:'Glute Bridge', eq:'db', type:'isolation'},
-        'kickback': {n:'Cable/Band Kickback', eq:'mc', type:'isolation'},
-        
-        // PUSH
-        'bench_bb': {n:'Bench Press', eq:'bb', type:'compound'},
-        'bench_db': {n:'Dumbbell Press', eq:'db', type:'compound'},
-        'ohp_bb': {n:'Overhead Press', eq:'bb', type:'compound'},
-        'ohp_db': {n:'Seated Shoulder Press', eq:'db', type:'compound'},
-        'incline_db': {n:'Incline DB Press', eq:'db', type:'compound'},
-        'pushup': {n:'Push-ups', eq:'bw', type:'compound'},
-        'lat_raise': {n:'Lateral Raises', eq:'db', type:'isolation'},
-        'tricep_ext': {n:'Tricep Extensions', eq:'mc', type:'isolation'},
-        
-        // PULL
-        'row_bb': {n:'Bent Over Row', eq:'bb', type:'compound'},
-        'row_db': {n:'One Arm Row', eq:'db', type:'compound'},
-        'lat_pulldown': {n:'Lat Pulldown', eq:'mc', type:'compound'},
-        'pullup': {n:'Pull-ups (or assisted)', eq:'bw', type:'compound'},
-        'facepull': {n:'Face Pulls', eq:'mc', type:'isolation'},
-        'bicep_curl': {n:'Bicep Curls', eq:'db', type:'isolation'},
-        
-        // CORE / CARRY
-        'plank': {n:'Plank', eq:'bw', type:'core'},
-        'deadbug': {n:'Dead Bug', eq:'bw', type:'core'},
-        'carry': {n:'Farmers Carry', eq:'kb', type:'core'},
-        'pallof': {n:'Pallof Press', eq:'mc', type:'core'},
-        
-        // CARDIO / FUNCTIONAL
-        'run_easy': {n:'Run (Zone 2)', eq:'c', type:'cardio'},
-        'run_interval': {n:'Interval Run', eq:'c', type:'cardio'},
-        'row_interval': {n:'Rowing Intervals', eq:'c', type:'cardio'},
-        'burpees': {n:'Burpees', eq:'bw', type:'cardio'},
-        'wallball': {n:'Wall Balls', eq:'kb', type:'compound'},
-        'sled': {n:'Sled Push/Pull', eq:'mc', type:'compound'}
-    };
-    return db[name] || {n:name, eq:'', type:'isolation'};
-}
-
-// ─── 2. TEMPLATE BUILDER ───
-// Bouwt de basis structuur op basis van user input
-function buildTemplate(style, level, goal, daysAvailable, distance) {
-    let days = [];
-    
-    // Helper om oefening toe te voegen met slimme defaults
-    function add(id, sets, reps, rest, note) {
-        let ex = getExercise(id);
-        
-        // Pas reps aan op basis van doel (Myofibrillair vs Sarcoplasmatisch)
-        let finalReps = reps;
-        let finalRest = rest;
-        let finalSets = sets;
-        
-        // Level scaling
-        if (level === 'beginner' && ex.type === 'compound') {
-            finalSets = Math.max(2, sets - 1); // Beginners minder volume
-        }
-
-        // Goal scaling (Massa vs Kracht)
-        if (goal === 'muscle') {
-            if (ex.type === 'compound') { finalReps = '8-10'; finalRest = '90s'; }
-            if (ex.type === 'isolation') { finalReps = '12-15'; finalRest = '60s'; }
-        } else if (goal === 'fat') {
-            finalRest = '45-60s'; // Kortere rust voor verbranding
-            if (typeof finalReps === 'number') finalReps += 2;
-        } 
-        
-        // Override als het specifiek is meegegeven
-        if(reps) finalReps = reps;
-        if(rest) finalRest = rest;
-
-        return { ...ex, s: finalSets, r: finalReps, rest: finalRest, note: note || '' };
-    }
-
-    // --- LOGICA PER STIJL ---
-    
-    // 1. BBB (Vrouwen Focus)
-    if (style === 'bbb') {
-        days.push({ name: 'Dag A (Glutes & Hammies)', exs: [
-            add('hip_thrust', 4, '10-12', '90s', 'Hold 2 sec bovenin'),
-            add('rdl_db', 3, '10-12', '75s', 'Focus op stretch'),
-            add('split_squat', 3, '10/kant', '60s', 'Leun iets naar voren'),
-            add('kickback', 3, '15/kant', '45s', 'Gecontroleerd'),
-            add('plank', 3, '45s', '60s', 'Core tight')
-        ]});
-        days.push({ name: 'Dag B (Full Body & Quads)', exs: [
-            add('squat_goblet', 4, '10-12', '90s', 'Diepte is key'),
-            add('ohp_db', 3, '10', '75s', 'Staand of zittend'),
-            add('step_up', 3, '10/kant', '60s', 'Niet afzetten met achterste voet'),
-            add('row_db', 3, '12/kant', '60s', ''),
-            add('deadbug', 3, '20 totaal', '45s', '')
-        ]});
-        if(daysAvailable >= 3) {
-             days.push({ name: 'Dag C (Glute Pump)', exs: [
-                add('glute_bridge', 3, '15', '45s', 'Constant tension'),
-                add('lunge_walking', 3, '20 stappen', '60s', ''),
-                add('lat_pulldown', 3, '12', '60s', 'Brede grip'),
-                add('pushup', 3, 'Max', '60s', ''),
-                add('pallof', 3, '12/kant', '45s', '')
-            ]});
-        }
-    }
-
-    // 2. FULLBODY
-    else if (style === 'fullbody') {
-        days.push({ name: 'Dag A', exs: [
-            add('squat_bb', 3, '6-8', '120s', 'Compound focus'),
-            add('bench_bb', 3, '6-8', '90s', ''),
-            add('row_bb', 3, '8-10', '90s', ''),
-            add('rdl_db', 3, '10-12', '75s', ''),
-            add('deadbug', 3, '10/kant', '60s', '')
-        ]});
-        if (daysAvailable >= 2) {
-             days.push({ name: 'Dag B', exs: [
-                add('deadlift_bb', 3, '5', '180s', 'Techniek focus'),
-                add('ohp_bb', 3, '6-8', '120s', ''),
-                add('pullup', 3, 'Max', '120s', 'Of Lat Pulldown'),
-                add('lunge_walking', 3, '10/kant', '75s', ''),
-                add('plank', 3, '45s', '60s', '')
-            ]});
-        }
-        if (daysAvailable >= 3) {
-            days.push({ name: 'Dag C', exs: [
-                add('leg_press', 3, '10-12', '90s', ''),
-                add('incline_db', 3, '10-12', '75s', ''),
-                add('row_db', 3, '10-12', '75s', ''),
-                add('lat_raise', 3, '15', '45s', 'Pompset'),
-                add('carry', 3, '40m', '60s', '')
-            ]});
-        }
-    }
-
-    // 3. HYBRID / RUN
-    else if (style === 'hybrid-run' || style === 'hardlopen') {
-        // Cardio sessies toevoegen
-        let longRun = distance >= 21 ? '70-90 min' : '40-50 min';
-        days.push({ name: 'Run 1: Interval', exs: [
-            {n:'Warming Up', eq:'c', s:1, r:'10 min', rest:'-', note:'Rustig inlopen'},
-            {n:'Intervals', eq:'c', s:6, r:'3 min', rest:'90s jog', note:'Hard tempo (Zone 4)'},
-            {n:'Cool Down', eq:'c', s:1, r:'10 min', rest:'-', note:'Uitwandelen'}
-        ]});
-        
-        days.push({ name: 'Strength A (Lower focus)', exs: [
-            add('squat_goblet', 3, '10', '90s', 'Niet tot falen'),
-            add('rdl_db', 3, '10', '75s', 'Hamstring gezondheid'),
-            add('plank', 3, '45s', '60s', ''),
-            add('step_up', 2, '12', '60s', 'Runner specifiek')
-        ]});
-
-        days.push({ name: 'Run 2: Long Run', exs: [
-            {n:'Duurloop', eq:'c', s:1, r:longRun, rest:'-', note:'Zone 2 (Praattempo) - ' + distance + 'km doel'}
-        ]});
-        
-        if (daysAvailable >= 4) {
-             days.push({ name: 'Strength B (Upper/Core)', exs: [
-                add('pushup', 3, '10-15', '60s', ''),
-                add('row_bb', 3, '10', '75s', 'Houding correctie'),
-                add('ohp_db', 3, '10', '60s', ''),
-                add('pallof', 3, '12/kant', '45s', 'Anti-rotatie')
-            ]});
-        }
-    }
-    
-    // 4. SPLIT (4+ dagen)
-    else if (style === 'split' || daysAvailable >= 4) {
-        days.push({ name: 'Upper A (Push Focus)', exs: [
-            add('bench_bb', 4, '6-8', '120s', 'Zwaar'),
-            add('ohp_db', 3, '8-10', '90s', ''),
-            add('row_db', 3, '10-12', '75s', ''),
-            add('lat_raise', 3, '15', '60s', ''),
-            add('tricep_ext', 3, '12-15', '60s', '')
-        ]});
-        days.push({ name: 'Lower A (Squat Focus)', exs: [
-            add('squat_bb', 4, '6-8', '180s', 'Zwaar'),
-            add('rdl_db', 3, '8-10', '90s', ''),
-            add('leg_press', 3, '12', '90s', ''),
-            add('carry', 3, '40m', '60s', '')
-        ]});
-        days.push({ name: 'Upper B (Pull Focus)', exs: [
-            add('pullup', 4, 'Max', '120s', 'Weighted indien mogelijk'),
-            add('incline_db', 3, '8-10', '90s', ''),
-            add('row_bb', 3, '10', '90s', ''),
-            add('facepull', 3, '15', '60s', 'Schouder gezondheid'),
-            add('bicep_curl', 3, '12', '60s', '')
-        ]});
-        days.push({ name: 'Lower B (Hinge/Uni Focus)', exs: [
-            add('deadlift_bb', 3, '5', '180s', 'Techniek focus'),
-            add('split_squat', 3, '8/kant', '90s', 'Unilateraal'),
-            add('hip_thrust', 3, '12', '90s', ''),
-            add('plank', 3, '60s', '60s', '')
-        ]});
-    }
-
-    // Default fallback naar Fullbody als er niets matcht
-    if (days.length === 0) return buildTemplate('fullbody', level, goal, daysAvailable);
-
-    return days.slice(0, daysAvailable);
-}
-
-// ─── 3. PERIODIZATION LOGIC ───
-// Dit is het "brein" dat de weken aanpast
-function applyPeriodization(dayObj, week) {
-    // Clone day om original niet te vervuilen
-    let newDay = JSON.parse(JSON.stringify(dayObj));
-    
-    let phase = '';
-    let modifier = '';
-
-    // LOGICA
-    if (week >= 1 && week <= 4) {
-        phase = 'Accumulatie (Opbouwen)';
-        modifier = 'base'; 
-    } else if (week >= 5 && week <= 8) {
-        phase = 'Intensificatie (Zwaarder)';
-        modifier = 'intensify';
-    } else if (week >= 9 && week <= 11) {
-        phase = 'Realisatie (Peak)';
-        modifier = 'peak';
-    } else {
-        phase = 'Deload (Herstel)';
-        modifier = 'deload';
-    }
-
-    newDay.exs.forEach(ex => {
-        // Cardio en Core slaan we over voor zware logica
-        if(ex.type === 'cardio') return;
-
-        // Base Reps parsen (bijv "8-10" wordt 8)
-        let baseRep = parseInt(String(ex.r).split('-')[0]); 
-        if(isNaN(baseRep)) baseRep = 10;
-
-        if (modifier === 'base') {
-            // Week 1-4: Gewoon doen wat er staat, langzaam RPE omhoog
-            let rpe = 6 + (week - 1); // RPE 6, 7, 8, 9 (week 4 is zwaar)
-            ex.note = `RPE ${rpe} ${ex.note ? '| ' + ex.note : ''}`;
-        }
-        else if (modifier === 'intensify') {
-            // Week 5-8: Minder reps, zwaarder gewicht
-            if(ex.type === 'compound') {
-                ex.r = Math.max(3, baseRep - 2); 
-                ex.note = `Zwaarder gewicht (+2.5/5kg) | RPE ${7 + (week-5)}`;
-            } else {
-                ex.note = `Focus muscle contraction | RPE 8`;
-            }
-        }
-        else if (modifier === 'peak') {
-            // Week 9-11: Zwaarste sets
-            if(ex.type === 'compound') {
-                ex.r = Math.max(2, baseRep - 3);
-                ex.s = Math.max(2, ex.s - 1); // Minder sets, max effort
-                ex.note = `TEST JE KRACHT | RPE 9-10`;
-            } else {
-                ex.note = 'Houd vorm strict';
-            }
-        }
-        else if (modifier === 'deload') {
-            // Week 12: Rustig aan
-            ex.s = 2;
-            ex.r = baseRep;
-            ex.note = '50% van normaal gewicht. Herstel.';
-            ex.rest = 'Rustig';
-        }
-    });
-
-    return { day: newDay, phase: phase };
-}
-
-
-// ─── GENERATE FUNCTION ───
-function generate(){
-  document.getElementById('loading').classList.add('active');
-  
-  setTimeout(function(){
-    // Inputs ophalen
-    const freq = parseInt(ans[0]);
-    const style = ans[1];
-    const distance = ans[2]; // Kan null zijn
-    const goal = ans[3];
-    const level = ans[4];
-
-    // 1. Basis Template Bouwen
-    const templateDays = buildTemplate(style, level, goal, freq, distance);
-
-    // HTML Bouwen
-    let h = '';
-    
-    // Header
-    h += `<div class="result-title-block">
-            <div class="brand">Academie over Gewicht — Training Protocol</div>
-            <h2>${SN[style] || 'Gepersonaliseerd Schema'}</h2>
-            <div class="tags">
-                <span class="tag">${freq}x p/w</span>
-                <span class="tag">${GN[goal]}</span>
-                <span class="tag">${LN[level]}</span>
-            </div>
-          </div>`;
-
-    // Uitleg Periodisering
-    h += `<div class="section">
-            <div class="section-title"><span class="icon">📈</span> Academie Strategie</div>
-            <div class="section-divider"></div>
-            <p class="overload-text">Dit schema gebruikt <strong>Mesocyclus Periodisering</strong>. We veranderen de prikkel elke 4 weken om stagnatie te voorkomen.</p>
-            <div class="blok-row">
-                <div class="blok-card"><div class="blok-name">Blok 1</div><div class="blok-weeks">Week 1-4</div><div class="blok-action">Volume Opbouw</div></div>
-                <div class="blok-card"><div class="blok-name">Blok 2</div><div class="blok-weeks">Week 5-8</div><div class="blok-action">Kracht Focus</div></div>
-                <div class="blok-card"><div class="blok-name">Blok 3</div><div class="blok-weeks">Week 9-11</div><div class="blok-action">Realisatie</div></div>
-                <div class="blok-card"><div class="blok-name">Blok 4</div><div class="blok-weeks">Week 12</div><div class="blok-action">Deload</div></div>
-            </div>
-          </div>`;
-
-    // ─── LOOP DOOR DE WEKEN ───
-    // Om de PDF niet oneindig lang te maken, tonen we 4 'Voorbeeldweken' (1 per blok)
-    // De gebruiker moet snappen dat ze dit blok herhalen.
-    
-    const displayWeeks = [1, 5, 9, 12]; //
-</body>
-</html>
+  <div class="question-label" id="q3-label
