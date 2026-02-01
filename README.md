@@ -1,0 +1,1 @@
+# academie-training-generator
