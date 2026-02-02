@@ -86,6 +86,9 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0a0a0
 .ex-tbl th{text-align:left;font-size:.58rem;color:#4a4a4a;text-transform:uppercase;letter-spacing:.6px;padding:5px 8px;border-bottom:1px solid #1a1a1a;background:#0f0f0f;font-weight:600}
 .ex-row{border-bottom:1px solid #191919}
 .ex-row:last-child{border-bottom:none}
+.divider-row{background:#0f0f0f;border-top:2px solid #c9a84c;border-bottom:2px solid #c9a84c}
+.divider-text{font-size:.82rem;color:#c9a84c;font-weight:700;padding:8px 0;text-align:center;letter-spacing:.5px}
+.divider-note{font-size:.68rem;color:#888;font-style:italic;text-align:center;padding-bottom:6px}
 .ex-row td{padding:7px 8px;vertical-align:top;font-size:.78rem}
 .ex-name{color:#eee;font-weight:500}
 .ex-badge{font-size:.55rem;padding:1px 5px;border-radius:3px;font-weight:600;text-transform:uppercase;letter-spacing:.2px;display:inline-block;margin-left:4px}
@@ -124,8 +127,16 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0a0a0
   .schema-header h1{color:#000;font-size:1.6rem}
   .schema-header .meta{color:#555}
   .schema-header .meta span{color:#000;font-weight:600}
+  .schema-header h3{color:#000!important;font-size:.85rem!important;margin-bottom:6px!important}
+  .schema-header p,.schema-header ul,.schema-header li{color:#000!important;font-size:.7rem!important}
+  .schema-header strong{color:#000!important}
+  .schema-header ul{margin-left:16px!important}
+  .schema-header li{margin-bottom:3px!important}
+  .schema-header span[style*="background"]{border:1px solid #999!important;color:#000!important;background:#f5f5f5!important}
   
   .schema-content{padding:0;max-width:100%}
+  .week-wrap{page-break-after:always;page-break-inside:avoid}
+  .week-wrap:last-child{page-break-after:auto}
   .wk-header{color:#000;border-top:1px solid #ccc;font-size:.8rem;padding:10px 0 6px;margin-top:10px;font-weight:700}
   .wk-header:first-child{border:none;margin-top:0}
 
@@ -142,6 +153,9 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0a0a0
   .ex-tbl th{background:#f0f0f0;color:#666;border-bottom:1.5px solid #ccc;font-size:.6rem}
   .ex-row{border-bottom:1px solid #ddd}
   .ex-row td{font-size:.75rem;padding:6px 8px}
+  .divider-row{background:#f8f8f8;border-top:2px solid #000;border-bottom:2px solid #000}
+  .divider-text{font-size:.8rem;color:#000;font-weight:700;padding:7px 0;text-align:center;letter-spacing:.4px}
+  .divider-note{font-size:.65rem;color:#444;font-style:italic;text-align:center;padding-bottom:5px}
   .ex-name{color:#000}
   .ex-sr{color:#000}
   .ex-rest{color:#444}
@@ -178,7 +192,8 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0a0a0
   <div class="block-nav" id="bnav"></div>
   <div class="schema-content" id="sc"></div>
   <div class="schema-actions">
-    <button class="btn btn-gold" onclick="window.print()">📄 Print Schema</button>
+    <button class="btn btn-gold" onclick="downloadPDF()">📥 Download als PDF</button>
+    <button class="btn" onclick="window.print()">🖨️ Print Schema</button>
     <button class="btn" onclick="location.reload()">🔄 Nieuwe Schema</button>
   </div>
 </div>
@@ -192,9 +207,12 @@ var qIdx=0,warn='';
 var STYLES={
   ppl:{name:'Push Pull Legs',min:3,max:6},
   ul:{name:'Upper/Lower Split',min:3,max:4},
-  bbb:{name:'BBB (Buik, Billen, Benen)',min:3,max:3},
+  bbb:{name:'BBB (Buik, Billen, Benen)',min:1,max:4},
   bro:{name:'Bro Split',min:5,max:5},
-  fb:{name:'Full Body',min:2,max:4}
+  fb:{name:'Full Body',min:2,max:4},
+  crossfit:{name:'CrossFit',min:1,max:6,cond:'none'},
+  hyrox:{name:'Hyrox',min:1,max:6,cond:'hyrox_mode'},
+  gymrace:{name:'Gymrace',min:1,max:6,cond:'gymrace_mode'}
 };
 
 // ─── POOLS ───
@@ -482,28 +500,1361 @@ var POOLS={
       ['Calf Raises','bw',3,15,'45s',6,'Heel volledig omhoog'],
       ['Plank','bw',2,'45s','30s',5,'Core vast']
     ]
+  },
+  // ════════════════════════════════════════
+  // HYBRID POOLS — CrossFit, Hyrox, Gymrace
+  // ════════════════════════════════════════
+  crossfit3_blok1:{
+    'Day A (Squat + AMRAP)':[['Barbell Squat','bb',4,5,'2-3 min',8,'Diep, rug recht'],
+['Bankdrukken','bb',3,6,'90s',7,'Schouders vast'],
+['── WOD: AMRAP 12 min ──','',null,null,null,null,'Zo veel rounds als mogelijk'],
+['Run','bw','AMRAP','400m','—',6,'Steady pace'],
+['Dumbbell Thrusters','db','AMRAP',10,'—',7,'Squat + press'],
+['Kettlebell Swing','kb','AMRAP',15,'—',7,'Explosieve hips'],
+['Burpees','bw','AMRAP',8,'—',7,'Chest to deck'],
+['── WOD Einde ──','',null,null,null,null,''],
+['Plank','bw',2,'45s','30s',5,'Core vast']
+],
+    'Day B (Deadlift + For Time)':[['Deadlift','bb',4,5,'2-3 min',8,'Rug recht'],
+['Overhead Press','bb',3,5,'90s',7,'Core vast'],
+['── WOD: For Time (4 Rounds) ──','',null,null,null,null,'Minimale tijd'],
+['Run','bw','4R','400m','—',6,'Race pace'],
+['Wall Balls','bw','4R',15,'—',7,'Diepe squat'],
+['Rowing Machine','bw','4R','250m','—',7,'Kracht uit hips'],
+['Box Jumps','bw','4R',10,'—',7,'Zacht landen'],
+['── WOD Einde ──','',null,null,null,null,''],
+['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+],
+    'Day C (Conditioning + EMOM)':[['Bent-over Row','bb',3,6,'75s',7,'Ellebogen langs romp'],
+['Romanian Deadlift','bb',3,8,'90s',7,'Hamstrings'],
+['── WOD: EMOM 10 min ──','',null,null,null,null,'1 movement per minuut'],
+['Kettlebell Swing','kb','EMOM',20,'—',7,'Ononderbroken'],
+['Box Jumps','bw','EMOM',8,'—',6,'Zacht landen'],
+['── WOD Einde ──','',null,null,null,null,''],
+['Farmers Carry','kb',3,'50m','60s',6,'Grip work'],
+['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Hip']
+]
+  },
+  crossfit3_blok2:{
+    'Day A (Front Squat + For Time)':[['Front Squat','bb',4,5,'2-3 min',8,'Ellebogen hoog'],
+['Incline Dumbbell Press','db',3,8,'90s',7,'Bank 30-45°'],
+['── WOD: For Time (5 Rounds) ──','',null,null,null,null,'Race tegen klok'],
+['Run','bw','5R','300m','—',6,'Sprint pace'],
+['Dumbbell Thrusters','db','5R',12,'—',7,'Explosief'],
+['Pull-ups','bw','5R',6,'—',7,'Kin over bar'],
+['Burpees','bw','5R',10,'—',7,'Constant tempo'],
+['── WOD Einde ──','',null,null,null,null,''],
+['Plank','bw',2,'45s','30s',5,'Core']
+],
+    'Day B (Sumo DL + Chipper)':[['Sumo Deadlift','bb',4,5,'2-3 min',8,'Brede stance'],
+['Push Press','bb',3,5,'90s',7,'Dip + drive'],
+['── WOD: Chipper ──','',null,null,null,null,'For time — werk af'],
+['Run','bw','1x','800m','—',6,'Steady opener'],
+['Kettlebell Swing','kb','1x',50,'—',7,'Ononderbroken'],
+['Wall Balls','bw','1x',40,'—',7,'Push door'],
+['Burpee Box Jump Over','bw','1x',30,'—',7,'Over box'],
+['Rowing Machine','bw','1x','500m','—',7,'Hard finish'],
+['── WOD Einde ──','',null,null,null,null,''],
+['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+],
+    'Day C (Accessory + AMRAP)':[['Bulgarian Split Squat','db',3,'8/been','75s',7,'Controlled'],
+['Weighted Pull-ups','bw',3,5,'90s',7,'Full ROM'],
+['── WOD: AMRAP 15 min ──','',null,null,null,null,'Volume focus'],
+['Assault Bike','bw','AMRAP','15 cal','—',6,'Hard effort'],
+['Dumbbell Snatch','db','AMRAP','8/arm','—',7,'Explosief'],
+['Toes-to-Bar','bw','AMRAP',8,'—',7,'Kip swing'],
+['Kettlebell Goblet Squat','kb','AMRAP',12,'—',7,'Diep'],
+['── WOD Einde ──','',null,null,null,null,''],
+['Plank','bw',2,'45s','30s',5,'Core']
+]
+  },
+  crossfit3_blok3:{
+    'Day A (Squat + EMOM Triplet)':[['Barbell Squat','bb',4,6,'2-3 min',8,'Volume opbouw'],
+['Bench Press','bb',3,6,'90s',7,'Paused reps'],
+['── WOD: EMOM 15 min (3-rotation) ──','',null,null,null,null,'Min 1/4/7/10/13: A, Min 2/5/8/11/14: B, Min 3/6/9/12/15: C'],
+['Kettlebell Swing','kb','EMOM',15,'—',7,'Odd minutes'],
+['Burpees','bw','EMOM',10,'—',7,'Even minutes'],
+['Box Jumps','bw','EMOM',8,'—',7,'Every 3rd'],
+['── WOD Einde ──','',null,null,null,null,''],
+['Slam Balls','bw',3,8,'45s',7,'Explosief'],
+['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Hip']
+],
+    'Day B (Deadlift + Buy-in AMRAP)':[['Deadlift','bb',4,6,'2-3 min',8,'Volume focus'],
+['Overhead Press','bb',3,6,'90s',7,'Strict press'],
+['── WOD: Buy-in + AMRAP 12 min ──','',null,null,null,null,'Start met buy-in'],
+['Run','bw','BUY-IN','1.2km','—',6,'Go hard'],
+['── Then AMRAP: ──','',null,null,null,null,''],
+['Dumbbell Thrusters','db','AMRAP',10,'—',7,'Light weight'],
+['Pull-ups','bw','AMRAP',8,'—',7,'Kipping/strict'],
+['Burpees','bw','AMRAP',12,'—',7,'Constant pace'],
+['── WOD Einde ──','',null,null,null,null,''],
+['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+],
+    'Day C (Skill + Conditioning)':[['── Skill: Handstand Hold ──','',null,null,null,null,'5 min practice'],
+['Handstand Hold','bw',5,'20s','60s',6,'Wall, tight core'],
+['── WOD: For Time (3 Rounds) ──','',null,null,null,null,'Heavy + hard'],
+['Run','bw','3R','400m','—',6,'Push pace'],
+['Power Clean','bb','3R',5,'—',8,'70% max'],
+['Wall Balls','bw','3R',20,'—',7,'Unbroken sets'],
+['Rowing Machine','bw','3R','250m','—',7,'Max effort'],
+['── WOD Einde ──','',null,null,null,null,''],
+['Plank','bw',2,'45s','30s',5,'Core']
+]
+  },
+  crossfit3_blok4:{
+    'Day A (Heavy Squat + Sprint WOD)':[['Barbell Squat','bb',5,3,'3 min',9,'Heavy — 85%+ 1RM'],
+['Bench Press','bb',4,5,'2 min',8,'Heavy sets'],
+['── WOD: For Time ──','',null,null,null,null,'Short, intense'],
+['Run','bw','1x','800m','—',7,'All-out'],
+['Burpee Box Jump Over','bw','1x',30,'—',8,'No rest'],
+['Kettlebell Swing','kb','1x',50,'—',8,'Comp weight 24/16kg'],
+['Run','bw','1x','400m','—',7,'Sprint finish'],
+['── WOD Einde ──','',null,null,null,null,''],
+['Plank','bw',2,'45s','30s',5,'Core']
+],
+    'Day B (Heavy DL + Long AMRAP)':[['Deadlift','bb',5,3,'3 min',9,'Heavy — 85%+ 1RM'],
+['Push Press','bb',4,5,'2 min',8,'Heavy'],
+['── WOD: AMRAP 18 min ──','',null,null,null,null,'Comp volume test'],
+['Run','bw','AMRAP','400m','—',6,'Steady pace'],
+['Dumbbell Thrusters','db','AMRAP',15,'—',7,'Comp weight 22.5/15kg'],
+['Pull-ups','bw','AMRAP',12,'—',7,'Chest to bar'],
+['Burpees','bw','AMRAP',15,'—',7,'Over bar'],
+['Box Jumps','bw','AMRAP',12,'—',7,'24/20 inch'],
+['── WOD Einde ──','',null,null,null,null,''],
+['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+],
+    'Day C (Oly Lifting + Metcon)':[['Power Clean','bb',5,3,'2-3 min',8,'Heavy triple'],
+['Push Jerk','bb',4,3,'2 min',8,'Explosive'],
+['── WOD: AMRAP 10 min ──','',null,null,null,null,'Light bar — speed'],
+['Power Clean','bb','AMRAP',5,'—',7,'60% max'],
+['Front Squat','bb','AMRAP',8,'—',7,'From clean'],
+['Push Press','bb','AMRAP',10,'—',7,'Continuous'],
+['Burpees','bw','AMRAP',12,'—',7,'Over bar'],
+['── WOD Einde ──','',null,null,null,null,''],
+['Plank','bw',2,'45s','30s',5,'Core']
+]
+  },
+  crossfit4_blok1:{
+    'Day A (Squat + AMRAP)':[
+      ['Barbell Squat','bb',4,5,'2-3 min',8,'Diep, rug recht'],
+      ['Bankdrukken','bb',3,6,'90s',7,'Schouders vast'],
+      ['── WOD: AMRAP 12 min ──','',null,null,null,null,'Zo veel rounds mogelijk'],
+      ['Run','bw','AMRAP','400m','—',6,'Steady pace'],
+      ['Dumbbell Thrusters','db','AMRAP',10,'—',7,'Squat + press'],
+      ['Kettlebell Swing','kb','AMRAP',15,'—',7,'Explosief'],
+      ['Burpees','bw','AMRAP',8,'—',7,'Fast'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Deadlift + For Time)':[
+      ['Deadlift','bb',4,5,'2-3 min',8,'Rug recht'],
+      ['Overhead Press','bb',3,5,'90s',7,'Core vast'],
+      ['── WOD: For Time (4 Rounds) ──','',null,null,null,null,'Race tempo'],
+      ['Run','bw','4R','400m','—',6,'Push pace'],
+      ['Wall Balls','bw','4R',15,'—',7,'Deep squat'],
+      ['Rowing Machine','bw','4R','250m','—',7,'Hard pulls'],
+      ['Box Jumps','bw','4R',10,'—',7,'Soft land'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Conditioning)':[
+      ['── WOD: Chipper ──','',null,null,null,null,'For time'],
+      ['Run','bw','1x','800m','—',6,'Opener'],
+      ['Kettlebell Swing','kb','1x',50,'—',7,'Unbroken'],
+      ['Burpees','bw','1x',40,'—',7,'Steady'],
+      ['Wall Balls','bw','1x',30,'—',7,'No rest'],
+      ['Box Jumps','bw','1x',20,'—',7,'Soft'],
+      ['Pull-ups','bw','1x',10,'—',7,'Full ROM'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Row + EMOM)':[
+      ['Bent-over Row','bb',3,6,'75s',7,'Ellebogen langs romp'],
+      ['Romanian Deadlift','bb',3,8,'90s',7,'Hamstrings'],
+      ['── WOD: EMOM 12 min (Alternate) ──','',null,null,null,null,'A-B pattern'],
+      ['Kettlebell Swing','kb','EMOM',15,'—',7,'Odd minutes'],
+      ['Burpees','bw','EMOM',10,'—',7,'Even minutes'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Farmers Carry','kb',3,'50m','60s',6,'Grip'],
+      ['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Hip']
+    ]
+  },
+  crossfit4_blok2:{
+    'Day A (Front Squat + For Time)':[
+      ['Front Squat','bb',4,5,'2-3 min',8,'Ellebogen hoog'],
+      ['Incline Dumbbell Press','db',3,8,'90s',7,'30-45°'],
+      ['── WOD: For Time (5 Rounds) ──','',null,null,null,null,'Sprint'],
+      ['Run','bw','5R','300m','—',6,'Fast'],
+      ['Dumbbell Thrusters','db','5R',12,'—',7,'Explosive'],
+      ['Pull-ups','bw','5R',6,'—',7,'Kin over bar'],
+      ['Burpees','bw','5R',10,'—',7,'Pace'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Sumo DL + Chipper)':[
+      ['Sumo Deadlift','bb',4,5,'2-3 min',8,'Wide stance'],
+      ['Push Press','bb',3,5,'90s',7,'Dip drive'],
+      ['── WOD: Chipper ──','',null,null,null,null,'Work through'],
+      ['Run','bw','1x','800m','—',6,'Steady'],
+      ['Kettlebell Swing','kb','1x',50,'—',7,'Unbroken'],
+      ['Wall Balls','bw','1x',40,'—',7,'Push'],
+      ['Burpee Box Jump Over','bw','1x',30,'—',7,'Over'],
+      ['Rowing Machine','bw','1x','500m','—',7,'Finish'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Long AMRAP)':[
+      ['── WOD: AMRAP 20 min ──','',null,null,null,null,'Volume'],
+      ['Run','bw','AMRAP','400m','—',6,'Between'],
+      ['Assault Bike','bw','AMRAP','15 cal','—',6,'Hard'],
+      ['Dumbbell Snatch','db','AMRAP','8/arm','—',7,'Fast'],
+      ['Toes-to-Bar','bw','AMRAP',8,'—',7,'Kip'],
+      ['Wall Balls','bw','AMRAP',15,'—',7,'Deep'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Accessory + EMOM)':[
+      ['Bulgarian Split Squat','db',3,'8/been','75s',7,'Controlled'],
+      ['Weighted Pull-ups','bw',3,5,'90s',7,'Full ROM'],
+      ['── WOD: EMOM 15 min (3-rotation) ──','',null,null,null,null,'ABC'],
+      ['Kettlebell Goblet Squat','kb','EMOM',12,'—',7,'Min 1,4,7,10,13'],
+      ['Box Jumps','bw','EMOM',10,'—',7,'Min 2,5,8,11,14'],
+      ['Burpees','bw','EMOM',8,'—',7,'Min 3,6,9,12,15'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  crossfit4_blok3:{
+    'Day A (Squat + EMOM Triplet)':[
+      ['Barbell Squat','bb',4,6,'2-3 min',8,'Volume'],
+      ['Bench Press','bb',3,6,'90s',7,'Paused'],
+      ['── WOD: EMOM 15 min (3-rotation) ──','',null,null,null,null,'ABC pattern'],
+      ['Kettlebell Swing','kb','EMOM',15,'—',7,'Odd'],
+      ['Burpees','bw','EMOM',10,'—',7,'Even'],
+      ['Box Jumps','bw','EMOM',8,'—',7,'Every 3rd'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Slam Balls','bw',3,8,'45s',7,'Explosive'],
+      ['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Hip']
+    ],
+    'Day B (Deadlift + Buy-in)':[
+      ['Deadlift','bb',4,6,'2-3 min',8,'Volume'],
+      ['Overhead Press','bb',3,6,'90s',7,'Strict'],
+      ['── WOD: Buy-in + AMRAP 12 min ──','',null,null,null,null,'Hard start'],
+      ['Run','bw','BUY-IN','1.2km','—',6,'Go'],
+      ['── Then AMRAP: ──','',null,null,null,null,''],
+      ['Dumbbell Thrusters','db','AMRAP',10,'—',7,'Light'],
+      ['Pull-ups','bw','AMRAP',8,'—',7,'Kipping'],
+      ['Burpees','bw','AMRAP',12,'—',7,'Pace'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Gymnastics)':[
+      ['── Skill: Muscle-up Practice ──','',null,null,null,null,'5 min'],
+      ['Ring Support Hold','bw',5,'20s','60s',6,'Tight'],
+      ['── WOD: For Time (4 Rounds) ──','',null,null,null,null,'Mixed'],
+      ['Run','bw','4R','400m','—',6,'Push'],
+      ['Power Clean','bb','4R',5,'—',8,'70%'],
+      ['Burpees','bw','4R',15,'—',7,'Over'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Skill + AMRAP)':[
+      ['── Skill: Handstand Walk ──','',null,null,null,null,'5 min'],
+      ['Handstand Hold','bw',5,'20s','60s',6,'Wall'],
+      ['── WOD: AMRAP 15 min ──','',null,null,null,null,'Volume'],
+      ['Rowing Machine','bw','AMRAP','250m','—',6,'Hard'],
+      ['Wall Balls','bw','AMRAP',20,'—',7,'Unbroken'],
+      ['Toes-to-Bar','bw','AMRAP',10,'—',7,'Kip'],
+      ['Box Jumps','bw','AMRAP',12,'—',7,'Soft'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  crossfit4_blok4:{
+    'Day A (Heavy Squat + Sprint)':[
+      ['Barbell Squat','bb',5,3,'3 min',9,'Heavy 85%+'],
+      ['Bench Press','bb',4,5,'2 min',8,'Heavy'],
+      ['── WOD: For Time ──','',null,null,null,null,'Sprint'],
+      ['Run','bw','1x','800m','—',7,'All-out'],
+      ['Burpee Box Jump Over','bw','1x',30,'—',8,'No rest'],
+      ['Kettlebell Swing','kb','1x',50,'—',8,'Comp 24/16kg'],
+      ['Run','bw','1x','400m','—',7,'Sprint'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Heavy DL + Long AMRAP)':[
+      ['Deadlift','bb',5,3,'3 min',9,'Heavy 85%+'],
+      ['Push Press','bb',4,5,'2 min',8,'Heavy'],
+      ['── WOD: AMRAP 18 min ──','',null,null,null,null,'Comp test'],
+      ['Run','bw','AMRAP','400m','—',6,'Steady'],
+      ['Dumbbell Thrusters','db','AMRAP',15,'—',7,'Comp 22.5/15kg'],
+      ['Pull-ups','bw','AMRAP',12,'—',7,'C2B'],
+      ['Burpees','bw','AMRAP',15,'—',7,'Over'],
+      ['Box Jumps','bw','AMRAP',12,'—',7,'24/20"'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Comp Simulation)':[
+      ['── WOD: For Time ──','',null,null,null,null,'Full comp'],
+      ['Run','bw','1x','2km','—',7,'Hard'],
+      ['Power Snatch','bb','1x',30,'—',8,'60%'],
+      ['Box Jump Over','bw','1x',40,'—',7,'24/20"'],
+      ['Wall Balls','bw','1x',50,'—',7,'20/14lb'],
+      ['Run','bw','1x','2km','—',7,'Finish'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Oly + Metcon)':[
+      ['Power Clean','bb',5,3,'2-3 min',8,'Heavy'],
+      ['Push Jerk','bb',4,3,'2 min',8,'Explosive'],
+      ['── WOD: AMRAP 10 min ──','',null,null,null,null,'Light speed'],
+      ['Power Clean','bb','AMRAP',5,'—',7,'60%'],
+      ['Front Squat','bb','AMRAP',8,'—',7,'From clean'],
+      ['Push Press','bb','AMRAP',10,'—',7,'Continuous'],
+      ['Burpees','bw','AMRAP',12,'—',7,'Over'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  crossfit5_blok1:{
+    'Day A (Squat + AMRAP)':[
+      ['Barbell Squat','bb',4,5,'2-3 min',8,'Diep'],
+      ['Bankdrukken','bb',3,6,'90s',7,'Schouders'],
+      ['── WOD: AMRAP 15 min ──','',null,null,null,null,'Volume'],
+      ['Run','bw','AMRAP','400m','—',6,'Steady'],
+      ['Dumbbell Thrusters','db','AMRAP',12,'—',7,'Fast'],
+      ['Kettlebell Swing','kb','AMRAP',20,'—',7,'Explosive'],
+      ['Burpees','bw','AMRAP',10,'—',7,'Pace'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Deadlift + For Time)':[
+      ['Deadlift','bb',4,5,'2-3 min',8,'Rug recht'],
+      ['Overhead Press','bb',3,5,'90s',7,'Core'],
+      ['── WOD: For Time (5 Rounds) ──','',null,null,null,null,'Fast'],
+      ['Run','bw','5R','400m','—',6,'Race'],
+      ['Wall Balls','bw','5R',15,'—',7,'Deep'],
+      ['Rowing Machine','bw','5R','250m','—',7,'Hard'],
+      ['Box Jumps','bw','5R',10,'—',7,'Soft'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Conditioning)':[
+      ['── WOD: Chipper ──','',null,null,null,null,'For time'],
+      ['Run','bw','1x','800m','—',6,'Steady'],
+      ['Kettlebell Swing','kb','1x',60,'—',7,'Unbroken'],
+      ['Burpees','bw','1x',50,'—',7,'Steady'],
+      ['Wall Balls','bw','1x',40,'—',7,'No rest'],
+      ['Box Jumps','bw','1x',30,'—',7,'Soft'],
+      ['Pull-ups','bw','1x',20,'—',7,'Kip'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Row + EMOM)':[
+      ['Bent-over Row','bb',3,6,'75s',7,'Ellebogen'],
+      ['Romanian Deadlift','bb',3,8,'90s',7,'Hamstrings'],
+      ['── WOD: EMOM 15 min (3-rotation) ──','',null,null,null,null,'ABC'],
+      ['Kettlebell Swing','kb','EMOM',15,'—',7,'Min 1,4,7,10,13'],
+      ['Burpees','bw','EMOM',10,'—',7,'Min 2,5,8,11,14'],
+      ['Box Jumps','bw','EMOM',8,'—',7,'Min 3,6,9,12,15'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Farmers Carry','kb',3,'50m','60s',6,'Grip'],
+      ['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Hip']
+    ],
+    'Day E (Oly + Metcon)':[
+      ['Power Clean','bb',4,3,'2-3 min',8,'Explosive'],
+      ['Push Press','bb',3,5,'90s',7,'Drive'],
+      ['── WOD: AMRAP 10 min ──','',null,null,null,null,'Light speed'],
+      ['Power Clean','bb','AMRAP',5,'—',7,'60%'],
+      ['Push Press','bb','AMRAP',8,'—',7,'From rack'],
+      ['Burpees','bw','AMRAP',10,'—',7,'Over'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  crossfit5_blok2:{
+    'Day A (Front Squat + For Time)':[
+      ['Front Squat','bb',4,5,'2-3 min',8,'Ellebogen hoog'],
+      ['Incline DB Press','db',3,8,'90s',7,'30-45°'],
+      ['── WOD: For Time (5 Rounds) ──','',null,null,null,null,'Race'],
+      ['Run','bw','5R','300m','—',6,'Sprint'],
+      ['Dumbbell Thrusters','db','5R',12,'—',7,'Fast'],
+      ['Pull-ups','bw','5R',6,'—',7,'C2B'],
+      ['Burpees','bw','5R',10,'—',7,'Pace'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Sumo DL + Chipper)':[
+      ['Sumo Deadlift','bb',4,5,'2-3 min',8,'Wide'],
+      ['Push Press','bb',3,5,'90s',7,'Dip drive'],
+      ['── WOD: Long Chipper ──','',null,null,null,null,'Grind'],
+      ['Run','bw','1x','1km','—',6,'Opener'],
+      ['Kettlebell Swing','kb','1x',70,'—',7,'Unbroken'],
+      ['Wall Balls','bw','1x',60,'—',7,'Push'],
+      ['Burpee Box Jump Over','bw','1x',50,'—',7,'Over'],
+      ['Rowing Machine','bw','1x','750m','—',7,'Finish'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Long AMRAP)':[
+      ['── WOD: AMRAP 25 min ──','',null,null,null,null,'Endurance'],
+      ['Run','bw','AMRAP','400m','—',6,'Between'],
+      ['Assault Bike','bw','AMRAP','20 cal','—',6,'Hard'],
+      ['Dumbbell Snatch','db','AMRAP','10/arm','—',7,'Fast'],
+      ['Toes-to-Bar','bw','AMRAP',10,'—',7,'Kip'],
+      ['Wall Balls','bw','AMRAP',20,'—',7,'Unbroken'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Accessory + EMOM)':[
+      ['Bulgarian Split Squat','db',3,'8/been','75s',7,'Controlled'],
+      ['Weighted Pull-ups','bw',3,5,'90s',7,'ROM'],
+      ['── WOD: EMOM 18 min (3-rotation) ──','',null,null,null,null,'Long'],
+      ['Kettlebell Goblet Squat','kb','EMOM',15,'—',7,'Min 1,4,7,10,13,16'],
+      ['Box Jumps','bw','EMOM',12,'—',7,'Min 2,5,8,11,14,17'],
+      ['Burpees','bw','EMOM',10,'—',7,'Min 3,6,9,12,15,18'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day E (Skill + Metcon)':[
+      ['── Skill: Double Unders ──','',null,null,null,null,'10 min'],
+      ['Double Under Practice','bw',10,'30 reps','60s',6,'Fast'],
+      ['── WOD: AMRAP 12 min ──','',null,null,null,null,'Fast pace'],
+      ['Assault Bike','bw','AMRAP','15 cal','—',6,'Sprint'],
+      ['Burpees','bw','AMRAP',15,'—',7,'Over'],
+      ['Wall Balls','bw','AMRAP',20,'—',7,'Unbroken'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  crossfit5_blok3:{
+    'Day A (Squat + Complex EMOM)':[
+      ['Barbell Squat','bb',4,6,'2-3 min',8,'Volume'],
+      ['Bench Press','bb',3,6,'90s',7,'Paused'],
+      ['── WOD: EMOM 18 min (3-rotation) ──','',null,null,null,null,'Long work'],
+      ['Kettlebell Swing','kb','EMOM',18,'—',7,'Min 1,4,7,10,13,16'],
+      ['Burpees','bw','EMOM',12,'—',7,'Min 2,5,8,11,14,17'],
+      ['Box Jumps','bw','EMOM',10,'—',7,'Min 3,6,9,12,15,18'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Slam Balls','bw',3,8,'45s',7,'Explosive'],
+      ['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Hip']
+    ],
+    'Day B (Deadlift + Double Buy-in)':[
+      ['Deadlift','bb',4,6,'2-3 min',8,'Volume'],
+      ['Overhead Press','bb',3,6,'90s',7,'Strict'],
+      ['── WOD: Double Buy-in + AMRAP ──','',null,null,null,null,'Hard'],
+      ['Run','bw','BUY-IN','1.2km','—',6,'Go'],
+      ['Rowing Machine','bw','BUY-IN','1km','—',6,'Go'],
+      ['── Then AMRAP 10 min: ──','',null,null,null,null,''],
+      ['Dumbbell Thrusters','db','AMRAP',12,'—',7,'Light'],
+      ['Pull-ups','bw','AMRAP',10,'—',7,'Kip'],
+      ['Burpees','bw','AMRAP',15,'—',7,'Fast'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Gymnastics)':[
+      ['── Skill: Bar Muscle-up ──','',null,null,null,null,'10 min'],
+      ['Chest-to-Bar Pull-ups','bw',5,5,'90s',7,'High'],
+      ['── WOD: For Time (5 Rounds) ──','',null,null,null,null,'Gym heavy'],
+      ['Run','bw','5R','300m','—',6,'Fast'],
+      ['Power Clean','bb','5R',5,'—',8,'70%'],
+      ['Burpees','bw','5R',12,'—',7,'Over'],
+      ['Toes-to-Bar','bw','5R',8,'—',7,'Kip'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Engine Work)':[
+      ['── WOD: AMRAP 20 min ──','',null,null,null,null,'Engine'],
+      ['Rowing Machine','bw','AMRAP','250m','—',6,'Steady'],
+      ['Wall Balls','bw','AMRAP',25,'—',7,'Unbroken'],
+      ['Box Jumps','bw','AMRAP',15,'—',7,'Soft'],
+      ['Assault Bike','bw','AMRAP','15 cal','—',6,'Hard'],
+      ['Burpees','bw','AMRAP',12,'—',7,'Pace'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day E (Olympic Complex)':[
+      ['Power Snatch','bb',5,3,'2-3 min',8,'Light'],
+      ['Overhead Squat','bb',4,3,'2 min',7,'Stable'],
+      ['── WOD: AMRAP 15 min ──','',null,null,null,null,'Oly focus'],
+      ['Hang Power Snatch','bb','AMRAP',5,'—',7,'60%'],
+      ['Overhead Squat','bb','AMRAP',3,'—',7,'From snatch'],
+      ['Burpees','bw','AMRAP',10,'—',7,'Over'],
+      ['Run','bw','AMRAP','200m','—',6,'Fast'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  crossfit5_blok4:{
+    'Day A (Heavy Squat + Sprint)':[
+      ['Barbell Squat','bb',5,3,'3 min',9,'Heavy 85%+'],
+      ['Bench Press','bb',4,5,'2 min',8,'Heavy'],
+      ['── WOD: For Time ──','',null,null,null,null,'Sprint'],
+      ['Run','bw','1x','800m','—',7,'All-out'],
+      ['Burpee Box Jump Over','bw','1x',30,'—',8,'No rest'],
+      ['Kettlebell Swing','kb','1x',50,'—',8,'Comp 24/16kg'],
+      ['Run','bw','1x','400m','—',7,'Sprint'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Heavy DL + Volume)':[
+      ['Deadlift','bb',5,3,'3 min',9,'Heavy 85%+'],
+      ['Push Press','bb',4,5,'2 min',8,'Heavy'],
+      ['── WOD: AMRAP 20 min ──','',null,null,null,null,'Comp volume'],
+      ['Run','bw','AMRAP','400m','—',6,'Steady'],
+      ['Dumbbell Thrusters','db','AMRAP',15,'—',7,'Comp 22.5/15kg'],
+      ['Pull-ups','bw','AMRAP',12,'—',7,'C2B'],
+      ['Burpees','bw','AMRAP',15,'—',7,'Over'],
+      ['Box Jumps','bw','AMRAP',12,'—',7,'24/20"'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Full Comp Sim)':[
+      ['── WOD: For Time ──','',null,null,null,null,'Full comp'],
+      ['Run','bw','1x','3km','—',7,'Hard'],
+      ['Power Snatch','bb','1x',40,'—',8,'60%'],
+      ['Box Jump Over','bw','1x',50,'—',7,'24/20"'],
+      ['Wall Balls','bw','1x',60,'—',7,'20/14lb'],
+      ['Burpees','bw','1x',40,'—',8,'Over'],
+      ['Run','bw','1x','2km','—',7,'Sprint'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Mixed Modal)':[
+      ['── WOD: AMRAP 25 min ──','',null,null,null,null,'Endurance'],
+      ['Run','bw','AMRAP','400m','—',6,'Between'],
+      ['Rowing Machine','bw','AMRAP','500m','—',7,'Hard'],
+      ['Power Clean','bb','AMRAP',10,'—',7,'70%'],
+      ['Burpees','bw','AMRAP',20,'—',7,'Fast'],
+      ['Box Jumps','bw','AMRAP',15,'—',7,'Soft'],
+      ['Wall Balls','bw','AMRAP',25,'—',7,'Unbroken'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day E (Heavy Oly + Finisher)':[
+      ['Power Clean','bb',5,3,'2-3 min',9,'Heavy 85%+'],
+      ['Push Jerk','bb',5,3,'2 min',9,'Max'],
+      ['── WOD: For Time ──','',null,null,null,null,'Oly finisher'],
+      ['Power Clean','bb','1x',21,'—',8,'60%'],
+      ['Front Squat','bb','1x',21,'—',8,'From clean'],
+      ['Push Press','bb','1x',21,'—',8,'Continuous'],
+      ['Burpees','bw','1x',21,'—',8,'Over'],
+      ['── WOD Einde ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  hyrox4_blok1:{
+    'Day A (Run + SkiErg + Strength)':[
+      ['── Run Block 1 ──','',null,null,null,null,'Hyrox race simulation'],
+      ['Run','bw',1,'800m','—',6,'Race pace'],
+      ['── Station: SkiErg ──','',null,null,null,null,'Basis station 1/4'],
+      ['SkiErg','bw',1,'1000m','—',7,'Core + armen'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Maintain'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Barbell Squat','bb',3,8,'90s',7,'Kracht'],
+      ['Overhead Press','bb',2,8,'60s',6,'Schouders'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Run + Sled + Burpees)':[
+      ['── Run Block 1 ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Steady'],
+      ['── Station: Sled Push ──','',null,null,null,null,'Basis station 2/4 — Alt: Prowler/Plate push'],
+      ['Sled Push','bw',1,'50m','—',8,'Laag blijven, benen'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Recovery'],
+      ['── Station: Burpee Broad Jump ──','',null,null,null,null,'Basis station 3/4'],
+      ['Burpee Broad Jump','bw',1,'100m','—',7,'Explosief springen'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Deadlift','bb',3,6,'90s',7,'Rug recht'],
+      ['Bent-over Row','bb',2,8,'60s',6,'Ellebogen'],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Run + Row + Farmers)':[
+      ['── Run Block 1 ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Tempo'],
+      ['── Station: Rowing ──','',null,null,null,null,'Roterende station 1 (Blok 1)'],
+      ['Rowing Machine','bw',1,'1000m','—',7,'Kracht uit hips'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Steady'],
+      ['── Station: Farmers Carry ──','',null,null,null,null,'Roterende station 2 (Blok 1) — Alt: Heavy DB/KB'],
+      ['Farmers Carry','kb',1,'200m','—',7,'Grip + core'],
+      ['── Accessory ──','',null,null,null,null,''],
+      ['Bulgarian Split Squat','db',2,'8/been','60s',6,'Balance'],
+      ['Hip Thrust','db',2,12,'60s',6,'Billen'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Run + Wall Balls + Strength)':[
+      ['── Run Block 1 ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Race'],
+      ['── Station: Wall Balls ──','',null,null,null,null,'Basis station 4/4'],
+      ['Wall Balls','bw',1,100,'—',7,'Diepe squat, hoog gooien'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Maintain'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Front Squat','bb',3,6,'90s',7,'Ellebogen hoog'],
+      ['Push Press','bb',2,8,'60s',6,'Drive'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  hyrox4_blok2:{
+    'Day A (Run + SkiErg + Strength)':[
+      ['── Run Block 1 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1km','—',6,'Pace'],
+      ['── Station: SkiErg ──','',null,null,null,null,'Basis station'],
+      ['SkiErg','bw',1,'1000m','—',7,'Core'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Maintain'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Barbell Squat','bb',3,8,'90s',7,'Volume'],
+      ['Overhead Press','bb',2,8,'60s',6,'Strict'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Run + Sled + Burpees)':[
+      ['── Run Block 1 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1km','—',6,'Steady'],
+      ['── Station: Sled Push ──','',null,null,null,null,'Basis station'],
+      ['Sled Push','bw',1,'50m','—',8,'Low push'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Recovery'],
+      ['── Station: Burpee Broad Jump ──','',null,null,null,null,'Basis station'],
+      ['Burpee Broad Jump','bw',1,'100m','—',7,'Explosive'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Deadlift','bb',3,6,'90s',7,'Heavy'],
+      ['Bent-over Row','bb',2,8,'60s',6,'Pull'],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Run + Lunges + Sled Pull)':[
+      ['── Run Block 1 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1km','—',6,'Tempo'],
+      ['── Station: Sandbag Lunges ──','',null,null,null,null,'Roterende station 1 (Blok 2) — Alt: DB/KB'],
+      ['Walking Lunges','db',1,'100m','—',7,'Controlled, knie achter teen'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Maintain'],
+      ['── Station: Sled Pull ──','',null,null,null,null,'Roterende station 2 (Blok 2) — Alt: Rope pull'],
+      ['Sled Pull','bw',1,'50m','—',8,'Lean back, pull hard'],
+      ['── Accessory ──','',null,null,null,null,''],
+      ['Bulgarian Split Squat','db',2,'8/been','60s',6,'Balance'],
+      ['Hip Thrust','db',2,12,'60s',6,'Glutes'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Run + Wall Balls + Strength)':[
+      ['── Run Block 1 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1km','—',6,'Race'],
+      ['── Station: Wall Balls ──','',null,null,null,null,'Basis station'],
+      ['Wall Balls','bw',1,100,'—',7,'Deep + high'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Steady'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Front Squat','bb',3,6,'90s',7,'Upright'],
+      ['Push Press','bb',2,8,'60s',6,'Explosive'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  hyrox4_blok3:{
+    'Day A (Run + SkiErg + Row)':[
+      ['── Run Block 1 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Build pace'],
+      ['── Station: SkiErg ──','',null,null,null,null,'Basis station'],
+      ['SkiErg','bw',1,'1000m','—',7,'Core power'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Maintain'],
+      ['── Station: Rowing ──','',null,null,null,null,'Roterende station (Blok 3)'],
+      ['Rowing Machine','bw',1,'1000m','—',7,'Hip drive'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Barbell Squat','bb',3,8,'90s',7,'Heavy'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Run + Sled + Burpees + Pull)':[
+      ['── Run Block 1 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Steady'],
+      ['── Station: Sled Push ──','',null,null,null,null,'Basis station'],
+      ['Sled Push','bw',1,'50m','—',8,'Power'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Recovery'],
+      ['── Station: Burpee Broad Jump ──','',null,null,null,null,'Basis station'],
+      ['Burpee Broad Jump','bw',1,'100m','—',7,'Fast'],
+      ['── Run Block 3 ──','',null,null,null,null,''],
+      ['Run','bw',1,'600m','—',6,'Push'],
+      ['── Station: Sled Pull ──','',null,null,null,null,'Roterende station (Blok 3)'],
+      ['Sled Pull','bw',1,'50m','—',8,'Pull'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day C (Run + Farmers + Accessory)':[
+      ['── Run Block 1 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Tempo'],
+      ['── Station: Farmers Carry ──','',null,null,null,null,'Roterende station (Blok 3)'],
+      ['Farmers Carry','kb',1,'200m','—',7,'Grip endurance'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Maintain'],
+      ['── Accessory ──','',null,null,null,null,''],
+      ['Bulgarian Split Squat','db',3,'8/been','60s',6,'Single leg'],
+      ['Hip Thrust','db',3,12,'60s',6,'Glute power'],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day D (Run + Wall Balls + Strength)':[
+      ['── Run Block 1 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Build'],
+      ['── Station: Wall Balls ──','',null,null,null,null,'Basis station'],
+      ['Wall Balls','bw',1,100,'—',7,'Unbroken sets'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Fast finish'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Deadlift','bb',3,6,'90s',7,'Heavy pull'],
+      ['Overhead Press','bb',2,8,'60s',6,'Strict'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  hyrox4_blok4:{
+    'Day A (Full Comp Sim — Alle 8 Stations)':[
+      ['── Run Block 1 ──','',null,null,null,null,'Competition prep'],
+      ['Run','bw',1,'1.5km','—',7,'Race pace'],
+      ['── Station 1: SkiErg ──','',null,null,null,null,''],
+      ['SkiErg','bw',1,'1000m','—',8,'Max effort'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Maintain'],
+      ['── Station 2: Sled Push ──','',null,null,null,null,''],
+      ['Sled Push','bw',1,'50m','—',9,'Heavy push'],
+      ['── Run Block 3 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Push through'],
+      ['── Station 3: Sled Pull ──','',null,null,null,null,''],
+      ['Sled Pull','bw',1,'50m','—',9,'Max pull'],
+      ['Plank','bw',2,'45s','30s',5,'Recovery']
+    ],
+    'Day B (Comp Sim — Continue)':[
+      ['── Run Block 4 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Steady'],
+      ['── Station 4: Burpee Broad Jump ──','',null,null,null,null,''],
+      ['Burpee Broad Jump','bw',1,'100m','—',8,'Fast turnover'],
+      ['── Run Block 5 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Keep pace'],
+      ['── Station 5: Rowing ──','',null,null,null,null,''],
+      ['Rowing Machine','bw',1,'1000m','—',8,'Power strokes'],
+      ['── Run Block 6 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Push'],
+      ['── Station 6: Farmers Carry ──','',null,null,null,null,''],
+      ['Farmers Carry','kb',1,'200m','—',8,'Heavy grip'],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Recovery']
+    ],
+    'Day C (Comp Sim — Final Stations)':[
+      ['── Run Block 7 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Dig deep'],
+      ['── Station 7: Sandbag Lunges ──','',null,null,null,null,''],
+      ['Walking Lunges','db',1,'100m','—',8,'Control + speed'],
+      ['── Run Block 8 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Final run'],
+      ['── Station 8: Wall Balls ──','',null,null,null,null,''],
+      ['Wall Balls','bw',1,100,'—',8,'Finish strong'],
+      ['── Cool-down ──','',null,null,null,null,''],
+      ['Light Walk','bw',1,'5 min','—',3,'Recovery walk'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Recovery + Strength)':[
+      ['── Light Run ──','',null,null,null,null,'Active recovery'],
+      ['Run','bw',1,'3km','—',5,'Easy pace, recovery'],
+      ['── Strength Maintenance ──','',null,null,null,null,''],
+      ['Barbell Squat','bb',3,6,'90s',7,'Maintain'],
+      ['Deadlift','bb',3,5,'90s',7,'Heavy'],
+      ['Overhead Press','bb',2,6,'60s',6,'Strict'],
+      ['── Mobility ──','',null,null,null,null,''],
+      ['Hip Flexor Stretch','bw',3,'30s/zijde','30s',4,'Deep stretch'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  hyrox5_blok1:{
+    'Day A (Run + SkiErg)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Race pace'],
+      ['── Station: SkiErg ──','',null,null,null,null,'Basis station'],
+      ['SkiErg','bw',1,'1000m','—',7,'Core'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Barbell Squat','bb',3,8,'90s',7,'Power'],
+      ['Overhead Press','bb',2,8,'60s',6,'Shoulders'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Run + Sled)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Tempo'],
+      ['── Station: Sled Push ──','',null,null,null,null,'Basis station'],
+      ['Sled Push','bw',1,'50m','—',8,'Low'],
+      ['── Station: Sled Pull ──','',null,null,null,null,'Roterende station'],
+      ['Sled Pull','bw',1,'50m','—',8,'Pull'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Deadlift','bb',3,6,'90s',7,'Heavy'],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Run + Burpees)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Steady'],
+      ['── Station: Burpee Broad Jump ──','',null,null,null,null,'Basis station'],
+      ['Burpee Broad Jump','bw',1,'100m','—',7,'Explosive'],
+      ['── Accessory ──','',null,null,null,null,''],
+      ['Bulgarian Split Squat','db',2,'8/been','60s',6,'Balance'],
+      ['Hip Thrust','db',2,12,'60s',6,'Glutes'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Run + Row + Farmers)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Tempo'],
+      ['── Station: Rowing ──','',null,null,null,null,'Roterende station'],
+      ['Rowing Machine','bw',1,'1000m','—',7,'Hips'],
+      ['── Station: Farmers Carry ──','',null,null,null,null,'Roterende station'],
+      ['Farmers Carry','kb',1,'200m','—',7,'Grip'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Bent-over Row','bb',3,8,'75s',7,'Pull'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day E (Run + Wall Balls)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Long run'],
+      ['── Station: Wall Balls ──','',null,null,null,null,'Basis station'],
+      ['Wall Balls','bw',1,100,'—',7,'Deep squat'],
+      ['── Finisher ──','',null,null,null,null,''],
+      ['Slam Balls','bw',3,8,'45s',7,'Explosive'],
+      ['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Hip']
+    ]
+  },
+  hyrox5_blok2:{
+    'Day A (Run + SkiErg)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1km','—',6,'Pace'],
+      ['── Station: SkiErg ──','',null,null,null,null,'Basis'],
+      ['SkiErg','bw',1,'1000m','—',7,'Core'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Barbell Squat','bb',3,8,'90s',7,'Volume'],
+      ['Overhead Press','bb',2,8,'60s',6,'Strict'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Run + Sled + Burpees)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Build'],
+      ['── Station: Sled Push ──','',null,null,null,null,'Basis'],
+      ['Sled Push','bw',1,'50m','—',8,'Power'],
+      ['── Station: Burpee Broad Jump ──','',null,null,null,null,'Basis'],
+      ['Burpee Broad Jump','bw',1,'100m','—',7,'Fast'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Deadlift','bb',3,6,'90s',7,'Heavy'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day C (Run + Lunges + Farmers)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1km','—',6,'Steady'],
+      ['── Station: Sandbag Lunges ──','',null,null,null,null,'Roterende'],
+      ['Walking Lunges','db',1,'100m','—',7,'Controlled'],
+      ['── Station: Farmers Carry ──','',null,null,null,null,'Roterende'],
+      ['Farmers Carry','kb',1,'200m','—',7,'Grip'],
+      ['── Accessory ──','',null,null,null,null,''],
+      ['Bulgarian Split Squat','db',2,'8/been','60s',6,'Balance'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Run + Row + Wall Balls)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Tempo'],
+      ['── Station: Rowing ──','',null,null,null,null,'Roterende'],
+      ['Rowing Machine','bw',1,'1000m','—',7,'Power'],
+      ['── Station: Wall Balls ──','',null,null,null,null,'Basis'],
+      ['Wall Balls','bw',1,100,'—',7,'Unbroken'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Front Squat','bb',3,6,'90s',7,'Upright'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day E (Run + Sled Pull + Strength)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',6,'Long'],
+      ['── Station: Sled Pull ──','',null,null,null,null,'Roterende'],
+      ['Sled Pull','bw',1,'50m','—',8,'Pull'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Push Press','bb',3,5,'90s',7,'Explosive'],
+      ['Bent-over Row','bb',2,8,'60s',6,'Pull'],
+      ['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Hip']
+    ]
+  },
+  hyrox5_blok3:{
+    'Day A (Run + SkiErg + Row)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Build'],
+      ['── Station: SkiErg ──','',null,null,null,null,'Basis'],
+      ['SkiErg','bw',1,'1000m','—',7,'Core'],
+      ['── Station: Rowing ──','',null,null,null,null,'Roterende'],
+      ['Rowing Machine','bw',1,'1000m','—',7,'Hips'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Barbell Squat','bb',3,8,'90s',7,'Heavy'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Run + Sled + Burpees + Pull)':[
+      ['── Run Block 1 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Pace'],
+      ['── Station: Sled Push ──','',null,null,null,null,'Basis'],
+      ['Sled Push','bw',1,'50m','—',8,'Power'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Maintain'],
+      ['── Station: Burpee Broad Jump ──','',null,null,null,null,'Basis'],
+      ['Burpee Broad Jump','bw',1,'100m','—',7,'Fast'],
+      ['── Station: Sled Pull ──','',null,null,null,null,'Roterende'],
+      ['Sled Pull','bw',1,'50m','—',8,'Pull'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day C (Run + Farmers + Lunges)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Tempo'],
+      ['── Station: Farmers Carry ──','',null,null,null,null,'Roterende'],
+      ['Farmers Carry','kb',1,'200m','—',7,'Endurance'],
+      ['── Station: Sandbag Lunges ──','',null,null,null,null,'Roterende'],
+      ['Walking Lunges','db',1,'100m','—',7,'Controlled'],
+      ['── Accessory ──','',null,null,null,null,''],
+      ['Hip Thrust','db',3,12,'60s',6,'Power'],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day D (Run + Wall Balls + Strength)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Build'],
+      ['── Station: Wall Balls ──','',null,null,null,null,'Basis'],
+      ['Wall Balls','bw',1,100,'—',7,'Unbroken'],
+      ['── Strength ──','',null,null,null,null,''],
+      ['Deadlift','bb',3,6,'90s',7,'Heavy'],
+      ['Overhead Press','bb',2,8,'60s',6,'Strict'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day E (Long Run + Mixed Stations)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'2.5km','—',6,'Endurance'],
+      ['── Station Mix: SkiErg + Burpees ──','',null,null,null,null,''],
+      ['SkiErg','bw',1,'500m','—',7,'Half distance'],
+      ['Burpee Broad Jump','bw',1,'50m','—',7,'Half distance'],
+      ['── Finisher ──','',null,null,null,null,''],
+      ['Slam Balls','bw',3,8,'45s',7,'Explosive'],
+      ['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Hip']
+    ]
+  },
+  hyrox5_blok4:{
+    'Day A (Comp Sim — Start)':[
+      ['── Run Block 1 ──','',null,null,null,null,'Full comp'],
+      ['Run','bw',1,'1.5km','—',7,'Race'],
+      ['── Station 1: SkiErg ──','',null,null,null,null,''],
+      ['SkiErg','bw',1,'1000m','—',8,'Max'],
+      ['── Run Block 2 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Maintain'],
+      ['── Station 2: Sled Push ──','',null,null,null,null,''],
+      ['Sled Push','bw',1,'50m','—',9,'Heavy'],
+      ['Plank','bw',2,'45s','30s',5,'Recovery']
+    ],
+    'Day B (Comp Sim — Middle 1)':[
+      ['── Run Block 3 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Push'],
+      ['── Station 3: Sled Pull ──','',null,null,null,null,''],
+      ['Sled Pull','bw',1,'50m','—',9,'Max'],
+      ['── Run Block 4 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Steady'],
+      ['── Station 4: Burpee Broad Jump ──','',null,null,null,null,''],
+      ['Burpee Broad Jump','bw',1,'100m','—',8,'Fast'],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Recovery']
+    ],
+    'Day C (Comp Sim — Middle 2)':[
+      ['── Run Block 5 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Keep'],
+      ['── Station 5: Rowing ──','',null,null,null,null,''],
+      ['Rowing Machine','bw',1,'1000m','—',8,'Power'],
+      ['── Run Block 6 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Push'],
+      ['── Station 6: Farmers Carry ──','',null,null,null,null,''],
+      ['Farmers Carry','kb',1,'200m','—',8,'Heavy'],
+      ['Plank','bw',2,'45s','30s',5,'Recovery']
+    ],
+    'Day D (Comp Sim — Finish)':[
+      ['── Run Block 7 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Dig'],
+      ['── Station 7: Sandbag Lunges ──','',null,null,null,null,''],
+      ['Walking Lunges','db',1,'100m','—',8,'Control'],
+      ['── Run Block 8 ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Final'],
+      ['── Station 8: Wall Balls ──','',null,null,null,null,''],
+      ['Wall Balls','bw',1,100,'—',8,'Finish'],
+      ['Light Walk','bw',1,'5 min','—',3,'Recovery']
+    ],
+    'Day E (Recovery + Maintenance)':[
+      ['── Easy Run ──','',null,null,null,null,'Active recovery'],
+      ['Run','bw',1,'4km','—',5,'Easy pace'],
+      ['── Strength Maintenance ──','',null,null,null,null,''],
+      ['Barbell Squat','bb',3,6,'90s',7,'Maintain'],
+      ['Deadlift','bb',3,5,'90s',7,'Heavy'],
+      ['── Mobility ──','',null,null,null,null,''],
+      ['Hip Stretch','bw',3,'30s/zijde','30s',4,'Deep'],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  gymrace3_blok1:{
+    'Day A (Run + Circuit)':[
+      ['── Run Block ──','',null,null,null,null,'Gymrace opener'],
+      ['Run','bw',1,'800m','—',6,'Tempo pace'],
+      ['── Circuit: 3 Rounds ──','',null,null,null,null,'Max effort, minimal rust'],
+      ['Barbell Squat','bb','3R',8,'—',7,'Race gewicht'],
+      ['Bankdrukken','bb','3R',8,'—',7,'Explosief'],
+      ['Bent-over Row','db','3R',10,'—',7,'Pull'],
+      ['Burpees','bw','3R',10,'—',7,'Fast'],
+      ['── Einde Circuit ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Run + Circuit 2)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Sprint pace'],
+      ['── Circuit: 4 Rounds ──','',null,null,null,null,'Volume focus'],
+      ['Deadlift','bb','4R',6,'—',7,'Heavy'],
+      ['Box Jumps','bw','4R',12,'—',7,'Soft land'],
+      ['Wall Balls','bw','4R',15,'—',7,'Deep squat'],
+      ['Kettlebell Swing','kb','4R',20,'—',7,'Hips'],
+      ['── Einde Circuit ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Run + Strength Circuit)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Steady'],
+      ['── Circuit: 3 Rounds ──','',null,null,null,null,'Heavy focus'],
+      ['Front Squat','bb','3R',6,'—',8,'Upright'],
+      ['Push Press','bb','3R',8,'—',7,'Drive'],
+      ['Pull-ups','bw','3R',8,'—',7,'Full ROM'],
+      ['Farmers Carry','kb','3R','50m','—',7,'Heavy'],
+      ['── Einde Circuit ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  gymrace3_blok2:{
+    'Day A (Run + AMRAP)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Race pace'],
+      ['── AMRAP 12 min ──','',null,null,null,null,'Volume test'],
+      ['Deadlift','bb','AMRAP',6,'—',7,'60% max'],
+      ['Box Jumps','bw','AMRAP',12,'—',7,'Soft'],
+      ['Wall Balls','bw','AMRAP',15,'—',7,'Unbroken'],
+      ['Kettlebell Swing','kb','AMRAP',20,'—',7,'Explosive'],
+      ['── Einde AMRAP ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day B (Run + Long AMRAP)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1km','—',6,'Steady'],
+      ['── AMRAP 15 min ──','',null,null,null,null,'Endurance'],
+      ['Barbell Squat','bb','AMRAP',8,'—',7,'70%'],
+      ['Bankdrukken','bb','AMRAP',10,'—',7,'Push'],
+      ['Rowing Machine','bw','AMRAP','250m','—',7,'Hard'],
+      ['Burpees','bw','AMRAP',12,'—',7,'Fast'],
+      ['Pull-ups','bw','AMRAP',8,'—',7,'Kip'],
+      ['── Einde AMRAP ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day C (Run + Sprint AMRAP)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'600m','—',6,'Sprint'],
+      ['── AMRAP 10 min ──','',null,null,null,null,'Fast pace'],
+      ['Dumbbell Thrusters','db','AMRAP',10,'—',7,'Squat + press'],
+      ['Box Jump Over','bw','AMRAP',12,'—',7,'Over'],
+      ['Wall Balls','bw','AMRAP',15,'—',7,'Deep'],
+      ['Burpees','bw','AMRAP',10,'—',7,'Over'],
+      ['── Einde AMRAP ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  gymrace3_blok3:{
+    'Day A (Run + For Time)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Steady pace'],
+      ['── For Time: 4 Rounds ──','',null,null,null,null,'Race sim'],
+      ['Dumbbell Thrusters','db','4R',10,'—',7,'Squat + press'],
+      ['Pull-ups','bw','4R',8,'—',7,'Kin over'],
+      ['Burpees','bw','4R',15,'—',7,'Over bar'],
+      ['Farmers Carry','kb','4R','50m','—',7,'Heavy'],
+      ['── Einde For Time ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Run + Chipper)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Fast'],
+      ['── Chipper For Time ──','',null,null,null,null,'Work through'],
+      ['Kettlebell Swing','kb','1x',60,'—',7,'Unbroken'],
+      ['Burpees','bw','1x',50,'—',7,'Steady'],
+      ['Wall Balls','bw','1x',40,'—',7,'No rest'],
+      ['Box Jumps','bw','1x',30,'—',7,'Soft'],
+      ['Pull-ups','bw','1x',20,'—',7,'Kip'],
+      ['── Einde Chipper ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Run + For Time 5R)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Tempo'],
+      ['── For Time: 5 Rounds ──','',null,null,null,null,'Volume'],
+      ['Barbell Squat','bb','5R',8,'—',7,'70%'],
+      ['Bankdrukken','bb','5R',8,'—',7,'Push'],
+      ['Bent-over Row','db','5R',10,'—',7,'Pull'],
+      ['Box Jumps','bw','5R',10,'—',7,'Soft'],
+      ['── Einde For Time ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  gymrace3_blok4:{
+    'Day A (Competition Simulation)':[
+      ['── Run Block ──','',null,null,null,null,'Full comp effort'],
+      ['Run','bw',1,'1.5km','—',7,'Race pace'],
+      ['── For Time: Mixed Modal ──','',null,null,null,null,'Comp format'],
+      ['Deadlift','bb','1x',30,'—',8,'Heavy comp weight'],
+      ['Box Jump Over','bw','1x',40,'—',7,'Fast turnover'],
+      ['Wall Balls','bw','1x',50,'—',7,'Unbroken if possible'],
+      ['Burpees','bw','1x',40,'—',8,'Over bar/plate'],
+      ['Run','bw','1x','800m','—',7,'Sprint finish'],
+      ['── Einde WOD ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Heavy Circuit + Run)':[
+      ['── Circuit: 4 Rounds For Time ──','',null,null,null,null,'Heavy weights'],
+      ['Barbell Squat','bb','4R',5,'—',8,'80% max'],
+      ['Bankdrukken','bb','4R',5,'—',8,'80% max'],
+      ['Deadlift','bb','4R',5,'—',8,'80% max'],
+      ['Burpees','bw','4R',15,'—',8,'Fast pace'],
+      ['── Einde Circuit ──','',null,null,null,null,''],
+      ['── Run Finisher ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Time trial pace'],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Recovery']
+    ],
+    'Day C (Final Test)':[
+      ['── AMRAP 20 min ──','',null,null,null,null,'Endurance comp test'],
+      ['Run','bw','AMRAP','400m','—',6,'Between movements'],
+      ['Dumbbell Thrusters','db','AMRAP',15,'—',7,'Comp weight 22.5/15kg'],
+      ['Pull-ups','bw','AMRAP',12,'—',7,'Chest to bar'],
+      ['Box Jumps','bw','AMRAP',15,'—',7,'24/20 inch'],
+      ['Burpees','bw','AMRAP',15,'—',7,'Over bar'],
+      ['Wall Balls','bw','AMRAP',20,'—',7,'20/14 lb'],
+      ['── Einde AMRAP ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Recovery']
+    ]
+  },
+  gymrace4_blok1:{
+    'Day A (Run + Circuit)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Tempo'],
+      ['── Circuit: 3 Rounds ──','',null,null,null,null,'Max effort'],
+      ['Barbell Squat','bb','3R',8,'—',7,'Race gewicht'],
+      ['Bankdrukken','bb','3R',8,'—',7,'Explosive'],
+      ['Bent-over Row','db','3R',10,'—',7,'Pull'],
+      ['Burpees','bw','3R',10,'—',7,'Fast'],
+      ['── Einde Circuit ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Run + Circuit 2)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Sprint'],
+      ['── Circuit: 4 Rounds ──','',null,null,null,null,'Volume'],
+      ['Deadlift','bb','4R',6,'—',7,'Heavy'],
+      ['Box Jumps','bw','4R',12,'—',7,'Soft'],
+      ['Wall Balls','bw','4R',15,'—',7,'Deep'],
+      ['Kettlebell Swing','kb','4R',20,'—',7,'Hips'],
+      ['── Einde Circuit ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Conditioning)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Long steady'],
+      ['── Chipper ──','',null,null,null,null,'For time'],
+      ['Kettlebell Swing','kb','1x',60,'—',7,'Unbroken'],
+      ['Burpees','bw','1x',50,'—',7,'Steady'],
+      ['Wall Balls','bw','1x',40,'—',7,'No rest'],
+      ['Box Jumps','bw','1x',30,'—',7,'Soft'],
+      ['── Einde Chipper ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Strength Circuit)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Steady'],
+      ['── Circuit: 3 Rounds ──','',null,null,null,null,'Heavy'],
+      ['Front Squat','bb','3R',6,'—',8,'Upright'],
+      ['Push Press','bb','3R',8,'—',7,'Drive'],
+      ['Pull-ups','bw','3R',8,'—',7,'ROM'],
+      ['Farmers Carry','kb','3R','50m','—',7,'Heavy'],
+      ['── Einde Circuit ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  gymrace4_blok2:{
+    'Day A (Run + AMRAP)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'800m','—',6,'Race'],
+      ['── AMRAP 15 min ──','',null,null,null,null,''],
+      ['Deadlift','bb','AMRAP',6,'—',7,'60%'],
+      ['Box Jumps','bw','AMRAP',12,'—',7,'Soft'],
+      ['Wall Balls','bw','AMRAP',15,'—',7,'Unbroken'],
+      ['Kettlebell Swing','kb','AMRAP',20,'—',7,'Explosive'],
+      ['── Einde AMRAP ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day B (Run + Long AMRAP)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1km','—',6,'Steady'],
+      ['── AMRAP 18 min ──','',null,null,null,null,'Endurance'],
+      ['Barbell Squat','bb','AMRAP',8,'—',7,'70%'],
+      ['Bankdrukken','bb','AMRAP',10,'—',7,'Push'],
+      ['Rowing Machine','bw','AMRAP','250m','—',7,'Hard'],
+      ['Burpees','bw','AMRAP',12,'—',7,'Fast'],
+      ['Pull-ups','bw','AMRAP',8,'—',7,'Kip'],
+      ['── Einde AMRAP ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day C (Long Run + Short AMRAP)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'2km','—',6,'Endurance pace'],
+      ['── AMRAP 10 min ──','',null,null,null,null,'Sprint'],
+      ['Dumbbell Thrusters','db','AMRAP',10,'—',7,'Fast'],
+      ['Box Jump Over','bw','AMRAP',12,'—',7,'Over'],
+      ['Wall Balls','bw','AMRAP',15,'—',7,'Deep'],
+      ['Burpees','bw','AMRAP',10,'—',7,'Over'],
+      ['── Einde AMRAP ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Mixed AMRAP)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1km','—',6,'Tempo'],
+      ['── AMRAP 12 min ──','',null,null,null,null,'Mixed'],
+      ['Assault Bike','bw','AMRAP','15 cal','—',6,'Hard'],
+      ['Kettlebell Swing','kb','AMRAP',20,'—',7,'Hips'],
+      ['Burpees','bw','AMRAP',15,'—',7,'Fast'],
+      ['Pull-ups','bw','AMRAP',10,'—',7,'Kip'],
+      ['── Einde AMRAP ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ]
+  },
+  gymrace4_blok3:{
+    'Day A (Run + For Time)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Steady'],
+      ['── For Time: 5 Rounds ──','',null,null,null,null,''],
+      ['Dumbbell Thrusters','db','5R',10,'—',7,'Squat + press'],
+      ['Pull-ups','bw','5R',8,'—',7,'Full ROM'],
+      ['Burpees','bw','5R',12,'—',7,'Over'],
+      ['Farmers Carry','kb','5R','50m','—',7,'Heavy'],
+      ['── Einde For Time ──','',null,null,null,null,''],
+      ['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Hip']
+    ],
+    'Day B (Run + Chipper)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.2km','—',6,'Fast'],
+      ['── Chipper For Time ──','',null,null,null,null,''],
+      ['Kettlebell Swing','kb','1x',70,'—',7,'Unbroken'],
+      ['Burpees','bw','1x',60,'—',7,'Steady'],
+      ['Wall Balls','bw','1x',50,'—',7,'Push'],
+      ['Box Jumps','bw','1x',40,'—',7,'Soft'],
+      ['Pull-ups','bw','1x',30,'—',7,'Kip'],
+      ['── Einde Chipper ──','',null,null,null,null,''],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Core']
+    ],
+    'Day C (Long Run + For Time)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',6,'Build'],
+      ['── For Time: 4 Rounds ──','',null,null,null,null,'Heavy'],
+      ['Barbell Squat','bb','4R',8,'—',7,'70%'],
+      ['Bankdrukken','bb','4R',8,'—',7,'Push'],
+      ['Bent-over Row','db','4R',10,'—',7,'Pull'],
+      ['Box Jumps','bw','4R',12,'—',7,'Soft'],
+      ['── Einde For Time ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day D (Sprint For Time)':[
+      ['── Run Block ──','',null,null,null,null,''],
+      ['Run','bw',1,'600m','—',6,'Sprint'],
+      ['── For Time: 3 Rounds ──','',null,null,null,null,'Fast'],
+      ['Deadlift','bb','3R',10,'—',7,'70%'],
+      ['Box Jump Over','bw','3R',15,'—',7,'Over'],
+      ['Wall Balls','bw','3R',20,'—',7,'Unbroken'],
+      ['Burpees','bw','3R',15,'—',7,'Over'],
+      ['── Einde For Time ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
+  },
+  gymrace4_blok4:{
+    'Day A (Comp Simulation)':[
+      ['── Run Block ──','',null,null,null,null,'Full comp'],
+      ['Run','bw',1,'1.5km','—',7,'Race'],
+      ['── For Time: Mixed ──','',null,null,null,null,'Comp format'],
+      ['Deadlift','bb','1x',30,'—',8,'Comp weight'],
+      ['Box Jump Over','bw','1x',40,'—',7,'Fast'],
+      ['Wall Balls','bw','1x',50,'—',7,'Unbroken'],
+      ['Burpees','bw','1x',40,'—',8,'Over'],
+      ['Run','bw','1x','800m','—',7,'Sprint'],
+      ['── Einde WOD ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ],
+    'Day B (Heavy Circuit)':[
+      ['── Circuit: 4R For Time ──','',null,null,null,null,'Heavy'],
+      ['Barbell Squat','bb','4R',5,'—',8,'80%'],
+      ['Bankdrukken','bb','4R',5,'—',8,'80%'],
+      ['Deadlift','bb','4R',5,'—',8,'80%'],
+      ['Burpees','bw','4R',15,'—',8,'Fast'],
+      ['── Einde Circuit ──','',null,null,null,null,''],
+      ['── Run Finisher ──','',null,null,null,null,''],
+      ['Run','bw',1,'1.5km','—',7,'Time trial'],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Recovery']
+    ],
+    'Day C (Endurance Test)':[
+      ['── AMRAP 20 min ──','',null,null,null,null,'Volume comp'],
+      ['Run','bw','AMRAP','400m','—',6,'Between'],
+      ['Dumbbell Thrusters','db','AMRAP',15,'—',7,'Comp 22.5/15kg'],
+      ['Pull-ups','bw','AMRAP',12,'—',7,'C2B'],
+      ['Box Jumps','bw','AMRAP',15,'—',7,'24/20"'],
+      ['Burpees','bw','AMRAP',15,'—',7,'Over'],
+      ['Wall Balls','bw','AMRAP',20,'—',7,'20/14lb'],
+      ['── Einde AMRAP ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Recovery']
+    ],
+    'Day D (Final Mixed Test)':[
+      ['── For Time ──','',null,null,null,null,'All-out'],
+      ['Run','bw','1x','1km','—',7,'Hard'],
+      ['Barbell Squat','bb','1x',21,'—',8,'70%'],
+      ['Burpees','bw','1x',21,'—',8,'Over'],
+      ['Deadlift','bb','1x',15,'—',8,'70%'],
+      ['Box Jump Over','bw','1x',15,'—',7,'Over'],
+      ['Dumbbell Thrusters','db','1x',9,'—',8,'Heavy'],
+      ['Run','bw','1x','800m','—',7,'Sprint finish'],
+      ['── Einde WOD ──','',null,null,null,null,''],
+      ['Plank','bw',2,'45s','30s',5,'Core']
+    ]
   }
-};
+}
 
 // ─── QUIZ ───
-function init(){qIdx=0;warn='';renderQ()}
+function init(){qIdx=0;warn='';cfg.hyrox_mode='prep';cfg.gymrace_mode='prep';renderQ()}
+
+function getFlow(){
+  var flow=['style'];
+  var st=STYLES[cfg.style];
+  if(st&&st.cond){
+    if(st.cond!=='none')flow.push(st.cond);
+  }
+  flow.push('days','level','goal');
+  return flow;
+}
 
 function renderQ(){
-  var qs=[qStyle,qDays,qLevel,qGoal];
+  var flow=getFlow();
+  var qs={style:qStyle,hyrox_mode:qHyroxMode,gymrace_mode:qGymraceMode,days:qDays,level:qLevel,goal:qGoal};
   var h='',dots='';
-  for(var i=0;i<4;i++)dots+='<div class="dot '+(i<qIdx?'done':(i===qIdx?'active':''))+'"></div>';
+  for(var i=0;i<flow.length;i++)dots+='<div class="dot '+(i<qIdx?'done':(i===qIdx?'active':''))+'"></div>';
   document.getElementById('prog').innerHTML=dots;
-  h+='<div class="step-label">Stap '+(qIdx+1)+' van 4</div>';
+  h+='<div class="step-label">Stap '+(qIdx+1)+' van '+flow.length+'</div>';
   if(warn)h+='<div class="warning show"><p>'+warn+'</p></div>';
-  h+=qs[qIdx]();
+  var key=flow[qIdx];
+  h+=qs[key]?qs[key]():'';
   document.getElementById('qc').innerHTML=h;
-  document.getElementById('gen-btn').style.display=(qIdx===3&&cfg.style&&cfg.days&&cfg.level&&cfg.goal)?'block':'none';
+  document.getElementById('gen-btn').style.display=(qIdx===flow.length-1&&cfg.style&&cfg.days&&cfg.level&&cfg.goal)?'block':'none';
 }
 
 function qStyle(){
-  var list=['ppl','ul','bbb','bro','fb'];
-  var icons={ppl:'💪',ul:'⚖️',bbb:'🍑',bro:'🏋️',fb:'🌐'};
-  var subs={ppl:'Duwen / Trekken / Benen',ul:'Bovenlichaam & Onderlichaam',bbb:'Focus op billen, benen en core',bro:'Elke dag 1 spiergroep',fb:'Alle spiergroepen elke sessie'};
+  var list=['ppl','ul','bbb','bro','fb','crossfit','hyrox','gymrace'];
+  var icons={ppl:'💪',ul:'⚖️',bbb:'🍑',bro:'🏋️',fb:'🌐',crossfit:'⚡',hyrox:'🔥',gymrace:'🏆'};
+  var subs={
+    ppl:'Duwen / Trekken / Benen',
+    ul:'Bovenlichaam & Onderlichaam',
+    bbb:'Focus op billen, benen en core',
+    bro:'Elke dag 1 spiergroep',
+    fb:'Alle spiergroepen elke sessie',
+    crossfit:'WODs, varied movements, GPP',
+    hyrox:'Fitness race prep — run + stations',
+    gymrace:'Competition prep — run + lifts'
+  };
   var h='<div class="question"><h2>Welke trainingsstijl wil je volgen?</h2></div><div class="options">';
   for(var i=0;i<list.length;i++){
     var s=list[i],sel=cfg.style===s?' sel':'';
@@ -512,7 +1863,31 @@ function qStyle(){
   return h+'</div>';
 }
 
-function selStyle(s){cfg.style=s;warn='';qIdx=1;renderQ()}
+function selStyle(s){cfg.style=s;warn='';qIdx++;renderQ()}
+
+function qHyroxMode(){
+  var h='<div class="question"><h2>Wat is je Hyrox doel?</h2></div><div class="options g2">';
+  var modes=[['prep','🎯','Event voorbereiding','Train voor een Hyrox race'],['functional','💪','Functionele fitness','Algemene conditioning & kracht']];
+  for(var i=0;i<modes.length;i++){
+    var m=modes[i],sel=cfg.hyrox_mode===m[0]?' sel':'';
+    h+='<div class="option'+sel+'" onclick="selHyroxMode(\''+m[0]+'\')"><span class="opt-icon">'+m[1]+'</span><div><div class="opt-text">'+m[2]+'</div><div class="opt-sub">'+m[3]+'</div></div></div>';
+  }
+  return h+'</div>';
+}
+
+function selHyroxMode(m){cfg.hyrox_mode=m;warn='';qIdx++;renderQ()}
+
+function qGymraceMode(){
+  var h='<div class="question"><h2>Wat is je Gymrace doel?</h2></div><div class="options g2">';
+  var modes=[['prep','🎯','Competition prep','Train voor een Gymrace event'],['functional','💪','Functionele fitness','Kracht + conditioning mix']];
+  for(var i=0;i<modes.length;i++){
+    var m=modes[i],sel=cfg.gymrace_mode===m[0]?' sel':'';
+    h+='<div class="option'+sel+'" onclick="selGymraceMode(\''+m[0]+'\')"><span class="opt-icon">'+m[1]+'</span><div><div class="opt-text">'+m[2]+'</div><div class="opt-sub">'+m[3]+'</div></div></div>';
+  }
+  return h+'</div>';
+}
+
+function selGymraceMode(m){cfg.gymrace_mode=m;warn='';qIdx++;renderQ()}
 
 function qDays(){
   var st=STYLES[cfg.style],h='<div class="question"><h2>Hoeveel dagen per week wil je trainen?</h2></div><div class="days-grid">';
@@ -532,11 +1907,15 @@ function selDays(d){
     warn='<strong>Let op:</strong> PPL vereist minimaal 3 dagen. We zetten je automatisch om naar Full Body ('+d+' dagen).';
     cfg.style='fb';
   }
+  else if(cfg.style==='bbb'&&(d===1||d===2)){
+    warn='<strong>Let op:</strong> BBB is geoptimaliseerd voor 3+ dagen. Voor '+d+' dagen adviseren we Full Body met focus op billen/benen.';
+    cfg.style='fb';
+  }
   else if(cfg.style==='fb'&&d>=5){
     warn='<strong>Let op:</strong> Full Body is niet optimaal voor 5+ dagen. We adviseren Push Pull Legs ('+d+' dagen).';
     cfg.style='ppl';
   }
-  qIdx=2;renderQ();
+  qIdx++;renderQ();
 }
 
 function qLevel(){
@@ -549,11 +1928,11 @@ function qLevel(){
   return h+'</div>';
 }
 
-function selLevel(l){cfg.level=l;warn='';qIdx=3;renderQ()}
+function selLevel(l){cfg.level=l;warn='';qIdx++;renderQ()}
 
 function qGoal(){
   var h='<div class="question"><h2>Wat is jouw primaire doel?</h2></div><div class="options g2">';
-  var goals=[['muscle','💪','Spieren opbouwen'],['fat','🔥','Vet verbranden'],['endurance','⚡','Uithoudingsvermogen'],['all','🌟','Algemene fitness']];
+  var goals=[['muscle','💪','Spieren opbouwen'],['fat','🔥','Vet verbranden'],['endurance','⚡','Uithoudingsvermogen'],['all','☀️','Algemene fitness']];
   for(var i=0;i<goals.length;i++){
     var g=goals[i],sel=cfg.goal===g[0]?' sel':'';
     h+='<div class="option'+sel+'" onclick="selGoal(\''+g[0]+'\')"><span class="opt-icon">'+g[1]+'</span><div><div class="opt-text">'+g[2]+'</div></div></div>';
@@ -564,30 +1943,481 @@ function qGoal(){
 function selGoal(g){cfg.goal=g;warn='';renderQ()}
 
 // ─── GENERATE ───
+function applyLevel(pool,lvl){
+  // Modify pool based on level
+  var newPool={};
+  for(var day in pool){
+    newPool[day]=[];
+    for(var i=0;i<pool[day].length;i++){
+      var ex=pool[day][i].slice(); // copy array
+      var name=ex[0],eq=ex[1],s=ex[2],r=ex[3],rest=ex[4],rpe=ex[5],note=ex[6];
+      
+      if(lvl==='beginner'){
+        // Beginner: min 6 reps, fewer sets, easier variations, lower RPE
+        if(typeof r==='number'&&r<6)r=6; // min 6 reps
+        if(s>=4)s=3; // compounds: 3 sets
+        else if(s===3)s=2; // accessories: 2 sets
+        if(rpe>=8)rpe=7; // lower RPE
+        else if(rpe>=7)rpe=6;
+        
+        // GYM STYLE: Replace hard exercises with easier variants
+        if(name==='Pull-ups'){name='Lat Pulldown';eq='bw';note='Machine variant — opbouwen naar pull-ups'}
+        else if(name==='Barbell Squat'&&s>=4){name='Goblet Squat';eq='db';note='Leer squat patroon met dumbbell'}
+        else if(name==='Deadlift'&&r<=5){name='Romanian Deadlift';eq='db';r=8;note='Bouw op naar barbell deadlift'}
+        else if(name==='Overhead Press'&&eq==='bb'){eq='db';note='Dumbbell variant voor stabiliteit'}
+        else if(name==='Tricep Dips'){name='Tricep Pushdown';eq='bw';note='Machine variant — veiliger'}
+        else if(name==='Decline Dumbbell Press'){name='Chest Fly';eq='db';note='Isolatie borst'}
+        else if(name==='Bent-over Row'&&eq==='bb'){eq='db';note='Dumbbell variant — balans'}
+        else if(name==='Copenhagen Plank'){name='Side Plank';eq='bw';r='30s';note='Opbouwen naar Copenhagen'}
+        
+        // HYBRID STYLE: CrossFit/Hyrox/Gymrace specific substitutions
+        else if(name==='Box Jumps'){name='Step-ups';eq='bw';note='Veiliger alternatief — bouw op naar box jumps'}
+        else if(name==='Box Jump Over'){name='Step-ups';eq='bw';note='Step over bench — minder impact'}
+        else if(name==='Burpee Box Jump Over'){name='Burpees';note='Skip box jump — focus op burpee techniek'}
+        else if(name==='Toes-to-Bar'){name='Hanging Knee Raises';eq='bw';note='Opbouwen naar toes-to-bar'}
+        else if(name==='Chest-to-Bar Pull-ups'){name='Pull-ups';eq='bw';note='Regular pull-ups — bouw op naar C2B'}
+        else if(name==='Weighted Pull-ups'){name='Pull-ups';eq='bw';note='Bodyweight eerst — geen extra gewicht'}
+        else if(name==='Muscle-up Practice'||name==='Bar Muscle-up'){name='Pull-up + Dip Practice';eq='bw';note='Bouw kracht voor muscle-up'}
+        else if(name==='Handstand Hold'){name='Wall Walk';eq='bw';r='5 reps';note='Opbouwen naar handstand'}
+        else if(name==='Handstand Walk'){name='Wall Walk';eq='bw';r='5 reps';note='Leer wall walks eerst'}
+        else if(name==='Ring Support Hold'){name='Parallel Bar Hold';eq='bw';note='Stabieler alternatief'}
+        else if(name==='Double Under Practice'){name='Single Unders';eq='bw';r='100 reps';note='Leer single unders eerst'}
+        else if(name==='Power Clean'&&eq==='bb'){eq='db';note='Dumbbell clean — leer techniek'}
+        else if(name==='Power Snatch'&&eq==='bb'){eq='db';note='Dumbbell snatch — veiliger'}
+        else if(name==='Hang Power Snatch'){eq='db';note='Dumbbell variant'}
+        else if(name==='Push Jerk'&&eq==='bb'){eq='db';note='Dumbbell jerk — techniek'}
+        else if(name==='Front Squat'&&eq==='bb'){eq='db';note='Goblet squat — leer positie'}
+        else if(name==='Overhead Squat'){name='Goblet Squat';eq='db';note='Start met goblet squat'}
+        else if(name==='Sumo Deadlift'){name='Romanian Deadlift';eq='db';note='RDL — leer hip hinge'}
+        else if(name==='Sled Push'){note='Licht gewicht of plate push — techniek eerst'}
+        else if(name==='Sled Pull'){note='Licht gewicht of rope pull — techniek eerst'}
+        else if(name==='Assault Bike'&&typeof r==='string'&&r.indexOf('cal')!==-1){
+          var cal=parseInt(r);
+          if(!isNaN(cal)&&cal>=15)r=(cal-5)+' cal';
+          note='Minder calorieën — bouw conditie op';
+        }
+        
+        ex=[name,eq,s,r,rest,rpe,note];
+      }
+      else if(lvl==='geavanceerd'){
+        // Advanced: higher RPE, extra accessory sets, intensity note
+        if(rpe<=6)rpe=7;
+        else if(rpe===7)rpe=8;
+        else if(rpe===8)rpe=8.5;
+        
+        // Add extra set to accessories (not compounds)
+        if(s===2)s=3;
+        else if(s===3&&r>=10)s=4; // accessories with high reps get extra set
+        
+        if(note.indexOf('—')===-1)note+=' — push intensiteit';
+        
+        ex=[name,eq,s,r,rest,rpe,note];
+      }
+      // gevorderd: keep as-is
+      
+      newPool[day].push(ex);
+    }
+  }
+  return newPool;
+}
+
+function applyGoal(pool,goal){
+  // Modify pool based on goal
+  if(goal==='all')return pool; // baseline
+  
+  var newPool={};
+  for(var day in pool){
+    newPool[day]=[];
+    var exList=pool[day];
+    for(var i=0;i<exList.length;i++){
+      var ex=exList[i].slice(); // copy
+      var name=ex[0],eq=ex[1],s=ex[2],r=ex[3],rest=ex[4],rpe=ex[5],note=ex[6];
+      var isCompound=(s>=3&&(typeof r==='number'&&r<=8));
+      
+      if(goal==='muscle'){
+        // Muscle: more rest, focus on compounds
+        if(rest==='45s')rest='60s';
+        else if(rest==='60s')rest='75s';
+        else if(rest==='75s')rest='90s';
+        else if(rest==='90s')rest='2 min';
+        // Lower reps on accessories for strength
+        if(!isCompound&&typeof r==='number'&&r>=12)r=10;
+        ex=[name,eq,s,r,rest,rpe,note];
+      }
+      else if(goal==='fat'){
+        // Fat loss: less rest, supersets, higher reps
+        if(rest==='90s'||rest==='2 min'||rest==='2-3 min')rest='60s';
+        else if(rest==='75s')rest='60s';
+        else if(rest==='60s')rest='45s';
+        else if(rest==='45s')rest='30s';
+        // Higher reps for metabolic stress
+        if(typeof r==='number'&&r<=8)r=10;
+        else if(typeof r==='number'&&r===10)r=12;
+        ex=[name,eq,s,r,rest,rpe,note];
+      }
+      else if(goal==='endurance'){
+        // Endurance: minimal rest, high reps, circuit-style
+        if(rest==='90s'||rest==='2 min'||rest==='2-3 min')rest='45s';
+        else if(rest==='75s')rest='45s';
+        else if(rest==='60s')rest='30s';
+        else if(rest==='45s')rest='30s';
+        else if(rest==='30s')rest='20s';
+        // High reps
+        if(typeof r==='number'&&r<=6)r=10;
+        else if(typeof r==='number'&&r<=10)r=15;
+        else if(typeof r==='number'&&r===12)r=15;
+        ex=[name,eq,s,r,rest,rpe,note];
+      }
+      
+      newPool[day].push(ex);
+    }
+    
+    // Add superset markers for fat/endurance on accessories
+    if(goal==='fat'||goal==='endurance'){
+      // Group accessories in supersets (skip first 2 compounds)
+      var marked=[];
+      for(var i=2;i<newPool[day].length-1;i+=2){
+        if(i+1<newPool[day].length){
+          // Mark as superset pair
+          marked.push({idx:i,pair:[newPool[day][i],newPool[day][i+1]]});
+        }
+      }
+      // No actual implementation of visual superset grouping yet, just adjusted rest
+    }
+  }
+  return newPool;
+}
+
 function generate(){
-  var key=cfg.style+(cfg.style==='ppl'?(cfg.days===6?'6':cfg.days>=3?'3':'3'):cfg.style==='ul'?(cfg.days===4?'4':'3'):cfg.style==='fb'?cfg.days:'');
+  var key=cfg.style;
+  var warn=''; // Warning message for suboptimal frequency
+  // Handle style variants based on days
+  if(cfg.style==='ppl'){
+    key=cfg.days===6?'ppl6':'ppl3';
+  }else if(cfg.style==='ul'){
+    key=cfg.days===4?'ul4':'ul3';
+  }else if(cfg.style==='fb'){
+    key='fb'+cfg.days;
+  }else if(cfg.style==='bbb'||cfg.style==='bro'){
+    // BBB and Bro always use base pool
+    key=cfg.style;
+  }else if(cfg.style==='crossfit'){
+    var basedays=cfg.days;
+    if(cfg.days<=2)basedays=3; // Smart scaling: use 3-day pool for 1-2 days
+    else if(cfg.days===6)basedays=5; // Smart scaling: use 5-day pool for 6 days
+    key='crossfit'+basedays;
+  }else if(cfg.style==='hyrox'){
+    var basedays=cfg.days;
+    if(cfg.days<=2)basedays=4; // Smart scaling: use 4-day pool for 1-2 days
+    else if(cfg.days===3)basedays=4; // Use 4-day pool for 3 days
+    else if(cfg.days===6)basedays=5; // Smart scaling: use 5-day pool for 6 days
+    key='hyrox'+basedays;
+  }else if(cfg.style==='gymrace'){
+    var basedays=cfg.days;
+    if(cfg.days<=2)basedays=3; // Smart scaling: use 3-day pool for 1-2 days
+    else if(cfg.days===5)basedays=4; // Use 4-day pool for 5 days
+    else if(cfg.days===6)basedays=4; // Smart scaling: use 4-day pool for 6 days
+    key='gymrace'+basedays;
+  }
+  
   var pool=POOLS[key];
+  // For hybrid styles with block variants, try _blok1 as initial pool
+  if(!pool&&(cfg.style==='crossfit'||cfg.style==='hyrox'||cfg.style==='gymrace')){
+    pool=POOLS[key+'_blok1'];
+  }
   if(!pool){alert('Pool niet gevonden: '+key);return}
+  
+  // BBB 4-day: add extra full body day
+  if(cfg.style==='bbb'&&cfg.days===4){
+    pool=JSON.parse(JSON.stringify(pool)); // deep copy
+    pool['Full Body Mix']=[
+      ['Barbell Squat','bb',3,8,'90s',7,'Rug recht'],
+      ['Bankdrukken','bb',3,8,'75s',7,'Schouders vast'],
+      ['Hip Thrust','db',3,12,'60s',7,'Knip bovenaan'],
+      ['Bent-over Row','db',3,10,'60s',7,'Ellebogen langs romp'],
+      ['Bulgarian Split Squat','db',3,'8/been','60s',6,'Achterbeen op bank'],
+      ['Overhead Press','db',2,8,'45s',6,'Core vast'],
+      ['Plank','bw',2,'45s','30s',5,'Core vast']
+    ];
+  }
+  
+  // Apply level modifications
+  pool=applyLevel(pool,cfg.level);
+  
+  // Apply goal modifications
+  pool=applyGoal(pool,cfg.goal);
   
   var html='',days=Object.keys(pool),totDays=days.length,wksPerBlock=3,totBlocks=4;
   
+  // Display warning for suboptimal frequency
+  if((cfg.style==='crossfit'||cfg.style==='hyrox'||cfg.style==='gymrace')&&cfg.days<=2){
+    html+='<div style="background:#2a1810;border:2px solid #c9a84c;padding:20px;margin:20px 0;border-radius:8px;color:#c9a84c;font-size:16px;line-height:1.6;"><strong>⚠️ Frequentie waarschuwing:</strong><br>Voor optimale resultaten bij '+STYLES[cfg.style].name+', wordt minimaal 3 trainingen per week aanbevolen. Met '+cfg.days+' dag'+(cfg.days===1?'':'en')+' per week is progressie mogelijk, maar langzamer.</div>';
+  }
+  
   for(var b=0;b<totBlocks;b++){
+    // For hybrid styles, select block-specific pool
+    var currentPool=pool;
+    if(cfg.style==='crossfit'||cfg.style==='hyrox'||cfg.style==='gymrace'){
+      var blockKey=key+'_blok'+(b+1);
+      if(POOLS[blockKey]){
+        currentPool=applyLevel(POOLS[blockKey],cfg.level);
+        currentPool=applyGoal(currentPool,cfg.goal);
+        days=Object.keys(currentPool);
+        totDays=days.length;
+      }
+      
+      // Smart scaling: slice days for 1-2, add skill day for 6
+      if(cfg.days<=2){
+        // Use first 1-2 days from base pool
+        var slicedPool={};
+        var dayKeys=Object.keys(currentPool);
+        for(var i=0;i<Math.min(cfg.days,dayKeys.length);i++){
+          slicedPool[dayKeys[i]]=currentPool[dayKeys[i]];
+        }
+        currentPool=slicedPool;
+        days=Object.keys(currentPool);
+        totDays=days.length;
+      }
+      else if(cfg.days===6){
+        // Add skill/recovery day to 5-day pool
+        var skillDayName='Day F (Skill & Recovery)';
+        if(cfg.style==='crossfit'){
+          currentPool[skillDayName]=[
+            ['── Skill: Handstand & Gymnastics ──','',null,null,null,null,'Focus op techniek en mobiliteit'],
+            ['Handstand Hold','bw',5,'30s','60s',6,'Wall practice'],
+            ['Wall Walk','bw',5,5,'60s',6,'Controlled tempo'],
+            ['Hollow Body Hold','bw',3,'30s','30s',5,'Core tension'],
+            ['Arch Body Hold','bw',3,'30s','30s',5,'Back tension'],
+            ['── Mobility ──','',null,null,null,null,''],
+            ['Hip Flexor Stretch','bw',3,'45s/zijde','30s',4,'Deep stretch'],
+            ['Thoracic Mobility','bw',3,'10 reps','30s',4,'Cat-cow variaties'],
+            ['Wrist Mobility','bw',3,'30s','20s',3,'Voorbereiden voor handstand work'],
+            ['── Active Recovery ──','',null,null,null,null,''],
+            ['Light Row','bw',1,'10 min','—',3,'Easy pace, recovery']
+          ];
+        }else if(cfg.style==='hyrox'){
+          currentPool[skillDayName]=[
+            ['── Easy Run ──','',null,null,null,null,'Active recovery pace'],
+            ['Run','bw',1,'3km','—',4,'Conversational pace, nasal breathing'],
+            ['── Mobility & Core ──','',null,null,null,null,''],
+            ['Hip Flexor Stretch','bw',3,'45s/zijde','30s',4,'Deep stretch'],
+            ['Foam Roll Quads','bw',3,'60s','30s',3,'Release tension'],
+            ['Foam Roll IT Band','bw',3,'60s','30s',3,'Lateral leg'],
+            ['Plank','bw',3,'45s','30s',5,'Core maintenance'],
+            ['Side Plank','bw',3,'30s/zijde','30s',5,'Lateral stability'],
+            ['Dead Bug','bw',3,'10/zijde','30s',5,'Core control'],
+            ['── Optional: Light Stations ──','',null,null,null,null,'Technique practice only'],
+            ['SkiErg','bw',3,'2 min','90s',4,'Easy pace, form check']
+          ];
+        }else if(cfg.style==='gymrace'){
+          currentPool[skillDayName]=[
+            ['── Skill: Olympic Lifting Technique ──','',null,null,null,null,'Light weight, perfect form'],
+            ['Hang Power Clean','bb',5,3,'90s',5,'60% max, focus techniek'],
+            ['Hang Power Snatch','bb',5,3,'90s',5,'50% max, focus techniek'],
+            ['Push Jerk','bb',5,3,'90s',5,'60% max, timing'],
+            ['── Mobility & Recovery ──','',null,null,null,null,''],
+            ['Hip Flexor Stretch','bw',3,'45s/zijde','30s',4,'Deep stretch'],
+            ['Thoracic Extension','bw',3,'10 reps','30s',4,'Foam roller'],
+            ['Wrist Mobility','bw',3,'30s','20s',3,'Front rack prep'],
+            ['── Light Conditioning ──','',null,null,null,null,'Recovery pace'],
+            ['Assault Bike','bw',1,'10 min','—',4,'Easy intervals: 30s on, 30s off'],
+            ['Plank','bw',2,'45s','30s',5,'Core']
+          ];
+        }
+        days=Object.keys(currentPool);
+        totDays=days.length;
+      }
+      else if(cfg.days===3&&cfg.style==='hyrox'){
+        // Slice 4-day Hyrox pool to 3 days (skip Day D)
+        var slicedPool={};
+        var dayKeys=Object.keys(currentPool);
+        for(var i=0;i<3&&i<dayKeys.length;i++){
+          slicedPool[dayKeys[i]]=currentPool[dayKeys[i]];
+        }
+        currentPool=slicedPool;
+        days=Object.keys(currentPool);
+        totDays=days.length;
+      }
+      else if(cfg.days===5&&cfg.style==='gymrace'){
+        // Add 5th day to 4-day Gymrace pool
+        var extraDay='Day E (Conditioning)';
+        currentPool[extraDay]=[
+          ['── Long Run ──','',null,null,null,null,'Build endurance'],
+          ['Run','bw',1,'2km','—',6,'Steady pace'],
+          ['── Circuit: 3 Rounds ──','',null,null,null,null,'Volume'],
+          ['Kettlebell Swing','kb','3R',25,'—',7,'Hips'],
+          ['Burpees','bw','3R',15,'—',7,'Fast pace'],
+          ['Wall Balls','bw','3R',20,'—',7,'Deep squat'],
+          ['── Einde Circuit ──','',null,null,null,null,''],
+          ['Plank','bw',2,'45s','30s',5,'Core']
+        ];
+        days=Object.keys(currentPool);
+        totDays=days.length;
+      }
+    }
+    
     html+='<div class="block'+(b===0?' show':'')+'" id="b'+b+'">';
     for(var w=0;w<wksPerBlock;w++){
-      var wkNum=b*wksPerBlock+w+1,isDeload=wkNum===12;
+      var wkNum=b*wksPerBlock+w+1,isDeload=(wkNum%6===0); // Deload every 6th week
+      html+='<div class="week-wrap">'; // Wrapper for page break
       html+='<div class="wk-header">Week '+wkNum+(isDeload?' — Deload':'')+'</div>';
       for(var di=0;di<totDays;di++){
-        var dayName=days[di],exs=pool[dayName];
+        var dayName=days[di],exs=currentPool[dayName];
         html+='<div class="day-card"><div class="day-hdr"><h3>'+dayName+'</h3>'+(isDeload?'<span class="deload-badge">Deload</span>':'')+'</div>';
-        html+='<div class="wu-bar"><strong>Warming-up:</strong> 5 min cardio + dynamische stretching (schouder rotaties, hip circles, squats)</div>';
+        
+        // Determine warmup type based on day name
+        // Determine warmup type based on style and day name
+        var warmupType='lower';
+        var dn=dayName.toLowerCase();
+        
+        // Hybrid styles get special warmups
+        if(cfg.style==='crossfit'||cfg.style==='hyrox'||cfg.style==='gymrace'){
+          warmupType='hybrid';
+        }
+        else if(dn.indexOf('upper')!==-1||dn.indexOf('push')!==-1||dn.indexOf('pull')!==-1||dn.indexOf('chest')!==-1||dn.indexOf('back')!==-1||dn.indexOf('shoulder')!==-1||dn.indexOf('arm')!==-1){
+          warmupType='upper';
+        }
+        
+        var warmupText='';
+        if(warmupType==='hybrid'){
+          warmupText='800m light jog → dynamic stretching → air squats → push-ups → jumping jacks → mobility prep';
+        }else if(warmupType==='upper'){
+          warmupText='5 min cardio → arm circles → schouder rotaties → band pull-aparts → push-ups (licht)';
+        }else{
+          warmupText='5 min cardio → hip circles → bodyweight squats → lunges → beenswingen';
+        }
+        
+        html+='<div class="wu-bar"><strong>Warming-up:</strong> '+warmupText+'</div>';
+        html+='<div class="wu-bar"><strong>Warming-up:</strong> '+warmupText+'</div>';
         html+='<table class="ex-tbl"><thead><tr><th>Oefening</th><th>Sets</th><th>Reps</th><th>Rust</th><th>RPE</th><th>Notitie</th><th>Log</th></tr></thead><tbody>';
         for(var ei=0;ei<exs.length;ei++){
           var ex=exs[ei],name=ex[0],eq=ex[1],s=ex[2],r=ex[3],rest=ex[4],rpe=ex[5],note=ex[6];
+          // Check if divider row (WOD/Station marker)
+          if(name.indexOf('──')!==-1){
+            html+='<tr class="divider-row"><td colspan="7"><div class="divider-text">'+name+'</div>';
+            if(note)html+='<div class="divider-note">'+note+'</div>';
+            html+='</td></tr>';
+            continue;
+          }
+          
           var sBadge='<span class="ex-badge b-'+eq+'">'+eq.toUpperCase()+'</span>';
           var sr=s,rr=r,hint='';
-          if(isDeload){sr=Math.ceil(s*0.6);rr=typeof r==='number'?Math.ceil(r*0.8):r;hint='<div class="w-hint">Deload: -40% sets, -20% reps</div>'}
-          else if(wkNum%3===2){rr=typeof r==='number'?r+2:r;hint='<div class="w-hint">Week '+wkNum+': +2 reps bij zelfde gewicht</div>'}
-          else if(wkNum%3===0&&wkNum!==12){hint='<div class="w-hint">Week '+wkNum+': Verhoog gewicht ~5%, reset naar basis reps</div>'}
+          
+          // Apply progression to actual values
+          // Detect exercise type for smart progression
+          var isHybrid=(cfg.style==='crossfit'||cfg.style==='hyrox'||cfg.style==='gymrace');
+          var isCardio=(name==='Run'||name==='Rowing Machine'||name.indexOf('Row')!==-1);
+          var isWOD=(typeof s==='string'&&(s==='AMRAP'||s==='EMOM'||s.indexOf('R')!==-1));
+          var isBodyweight=(name==='Burpees'||name==='Burpee Broad Jump'||name==='Box Jumps'||name==='Wall Balls');
+          
+          if(isDeload){
+            if(isHybrid){
+              // Hybrid deload: active recovery
+              if(isCardio){
+                if(typeof rr==='string'&&rr.indexOf('km')!==-1){
+                  var km=parseFloat(rr);
+                  if(!isNaN(km))rr=(km*0.7).toFixed(1)+'km';
+                }else if(typeof rr==='string'&&rr.indexOf('m')!==-1){
+                  var m=parseInt(rr);
+                  if(!isNaN(m))rr=Math.ceil(m*0.7)+'m';
+                }
+              }else if(isWOD||isBodyweight){
+                if(typeof rr==='number')rr=Math.ceil(rr*0.5);
+              }else{
+                sr=Math.ceil(s*0.6);
+                rr=typeof r==='number'?Math.ceil(r*0.8):r;
+              }
+              hint='<div class="w-hint">Deload: active recovery + skill work</div>';
+            }else{
+              sr=Math.ceil(s*0.6);
+              rr=typeof r==='number'?Math.ceil(r*0.8):r;
+              hint='<div class="w-hint">Deload week: licht gewicht, focus op herstel</div>';
+            }
+          }
+          else{
+            var weekInBlock=(wkNum-1)%3+1;
+            var prevWeek=wkNum-1;
+            
+            if(weekInBlock===2){
+              // WEEK 2: Volume increase
+              if(isCardio){
+                if(typeof rr==='string'){
+                  if(rr.indexOf('km')!==-1){
+                    var km=parseFloat(rr);
+                    if(!isNaN(km))rr=(km+0.2).toFixed(1)+'km';
+                  }else if(rr.indexOf('m')!==-1){
+                    var m=parseInt(rr);
+                    if(!isNaN(m))rr=(m+200)+'m';
+                  }
+                }
+                hint='<div class="w-hint">+200m t.o.v. week '+prevWeek+' — focus op constante ademhaling</div>';
+              }
+              else if(isBodyweight){
+                if(typeof rr==='number')rr=r+2;
+                hint='<div class="w-hint">+2 reps t.o.v. week '+prevWeek+'</div>';
+              }
+              else if(isWOD){
+                if(typeof rr==='number'&&(eq==='bb'||eq==='db'||eq==='kb'))rr=r+2;
+                hint='<div class="w-hint">Push meer rounds/reps t.o.v. week '+prevWeek+'</div>';
+              }
+              else if(typeof r==='number'){
+                rr=r+2;
+                hint='<div class="w-hint">+2 reps t.o.v. week '+prevWeek+', zelfde gewicht</div>';
+              }
+              else if(typeof r==='string'){
+                if(r.indexOf('/been')!==-1||r.indexOf('/zijde')!==-1){
+                  var num=parseInt(r);
+                  if(!isNaN(num))rr=(num+2)+r.replace(/^[0-9]+/,'');
+                  hint='<div class="w-hint">+2 reps per zijde t.o.v. week '+prevWeek+'</div>';
+                }else if(r.indexOf('s')!==-1){
+                  var sec=parseInt(r);
+                  if(!isNaN(sec))rr=(sec+5)+'s';
+                  hint='<div class="w-hint">+5s vasthouden t.o.v. week '+prevWeek+'</div>';
+                }
+              }
+            }
+            else if(weekInBlock===3){
+              // WEEK 3: Intensity increase
+              if(isCardio){
+                hint='<div class="w-hint">Sneller tempo t.o.v. week '+prevWeek+' — push hartslag omhoog</div>';
+              }
+              else if(isBodyweight){
+                hint='<div class="w-hint">Sneller tempo t.o.v. week '+prevWeek+', terug naar basis reps</div>';
+              }
+              else if(isWOD){
+                if(eq==='bb'||eq==='db'||eq==='kb'){
+                  hint='<div class="w-hint">Zwaarder gewicht (comp standards) t.o.v. week '+prevWeek+'</div>';
+                }else{
+                  hint='<div class="w-hint">Sneller tempo t.o.v. week '+prevWeek+'</div>';
+                }
+              }
+              else{
+                hint='<div class="w-hint">Verhoog gewicht ~5kg t.o.v. week '+prevWeek+', terug naar basis reps</div>';
+              }
+            }
+            else{
+              // WEEK 1 of block
+              if(wkNum===1){
+                if(isCardio){
+                  hint='<div class="w-hint">Eerste week — vind je tempo, focus op ademhaling</div>';
+                }else if(isBodyweight||isWOD){
+                  hint='<div class="w-hint">Eerste week — vind je ritme, focus op bewegingskwaliteit</div>';
+                }else{
+                  hint='<div class="w-hint">Eerste week — vind je werkgewicht, focus op techniek</div>';
+                }
+              }else{
+                var prevCycleWeek1=wkNum-3;
+                if(isCardio){
+                  hint='<div class="w-hint">Nieuwe cyclus — verhoog basis tempo t.o.v. week '+prevCycleWeek1+'</div>';
+                }else if(isBodyweight||isWOD){
+                  hint='<div class="w-hint">Nieuwe cyclus — push intensiteit t.o.v. week '+prevCycleWeek1+'</div>';
+                }else{
+                  hint='<div class="w-hint">Nieuwe cyclus — verhoog basis gewicht t.o.v. week '+prevCycleWeek1+'</div>';
+                }
+              }
+            }
+          }
+          
           var logs='<div class="log-row">';
           for(var si=0;si<sr;si++)logs+='<span class="log-box">Set '+(si+1)+'</span>';
           logs+='</div>';
@@ -596,12 +2426,70 @@ function generate(){
         html+='</tbody></table>';
         html+='<div class="cd-bar"><strong>Cool-down:</strong> 5 min rustige cardio (wandelen/roeien) + statische stretching</div></div>';
       }
+      html+='</div>'; // close week-wrap
     }
     html+='</div>';
   }
   
   document.getElementById('s-title').textContent='12 Weken '+STYLES[cfg.style].name+' Programma';
-  document.getElementById('s-meta').innerHTML='<span>'+cfg.days+' dagen/week</span> • <span>'+cfg.level.charAt(0).toUpperCase()+cfg.level.slice(1)+'</span> • <span>'+cfg.goal.charAt(0).toUpperCase()+cfg.goal.slice(1)+'</span>';
+  var goalNames={muscle:'Spieren opbouwen',fat:'Vet verbranden',endurance:'Uithoudingsvermogen',all:'Algemene fitness'};
+  var metaHtml='<span>'+cfg.days+' dagen/week</span> • <span>'+cfg.level.charAt(0).toUpperCase()+cfg.level.slice(1)+'</span> • <span>'+goalNames[cfg.goal]+'</span>';
+  
+  // Add guide section for page 1
+  metaHtml+='<div style="max-width:720px;margin:24px auto 0;text-align:left;line-height:1.6">';
+  
+  // RPE uitleg
+  metaHtml+='<div style="margin-bottom:20px"><h3 style="color:#c9a84c;font-size:.95rem;margin-bottom:8px;font-weight:600">📊 RPE Uitleg (Rate of Perceived Exertion)</h3>';
+  metaHtml+='<p style="font-size:.8rem;color:#888;margin-bottom:6px">RPE meet hoe zwaar een set aanvoelt op een schaal van 1-10:</p>';
+  metaHtml+='<ul style="font-size:.75rem;color:#aaa;margin-left:20px">';
+  metaHtml+='<li><strong style="color:#c9a84c">RPE 5-6:</strong> Licht — je kunt nog 4-5 reps doen</li>';
+  metaHtml+='<li><strong style="color:#c9a84c">RPE 7:</strong> Matig zwaar — nog 3 reps over</li>';
+  metaHtml+='<li><strong style="color:#c9a84c">RPE 8:</strong> Zwaar — nog 2 reps over</li>';
+  metaHtml+='<li><strong style="color:#c9a84c">RPE 8.5:</strong> Zeer zwaar — nog 1 rep over</li>';
+  metaHtml+='<li><strong style="color:#c9a84c">RPE 9-10:</strong> Maximaal — geen reps meer mogelijk</li>';
+  metaHtml+='</ul></div>';
+  
+  // Equipment badges
+  metaHtml+='<div style="margin-bottom:20px"><h3 style="color:#c9a84c;font-size:.95rem;margin-bottom:8px;font-weight:600">🏋️ Equipment Afkortingen</h3>';
+  metaHtml+='<div style="display:flex;gap:8px;flex-wrap:wrap;font-size:.7rem">';
+  metaHtml+='<span style="background:#2a1a08;color:#c9a84c;padding:3px 8px;border-radius:4px;font-weight:600">BB = Barbell</span>';
+  metaHtml+='<span style="background:#082a3a;color:#5aabcc;padding:3px 8px;border-radius:4px;font-weight:600">DB = Dumbbell</span>';
+  metaHtml+='<span style="background:#1f082a;color:#aa6acc;padding:3px 8px;border-radius:4px;font-weight:600">KB = Kettlebell</span>';
+  metaHtml+='<span style="background:#082a10;color:#5acc7a;padding:3px 8px;border-radius:4px;font-weight:600">BW = Bodyweight</span>';
+  metaHtml+='</div></div>';
+  
+  // Loggen uitleg
+  metaHtml+='<div style="margin-bottom:20px"><h3 style="color:#c9a84c;font-size:.95rem;margin-bottom:8px;font-weight:600">📝 Waarom Loggen Cruciaal Is</h3>';
+  metaHtml+='<p style="font-size:.8rem;color:#888;margin-bottom:6px">Progressie is onmogelijk zonder tracking. Log elke set:</p>';
+  metaHtml+='<ul style="font-size:.75rem;color:#aaa;margin-left:20px">';
+  metaHtml+='<li><strong style="color:#c9a84c">Gewicht:</strong> Hoeveel kg gebruik je? (bijv. "60kg")</li>';
+  metaHtml+='<li><strong style="color:#c9a84c">Reps:</strong> Hoeveel herhalingen heb je gedaan? (bijv. "8")</li>';
+  metaHtml+='<li><strong style="color:#c9a84c">RPE:</strong> Hoe zwaar voelde het? (bijv. "RPE 7")</li>';
+  metaHtml+='</ul>';
+  metaHtml+='<p style="font-size:.75rem;color:#666;margin-top:8px;font-style:italic">💡 Tip: Vergelijk je prestaties met vorige week. Zie je vooruitgang? Zo niet, pas gewicht of rust aan.</p>';
+  metaHtml+='</div>';
+  
+  metaHtml+='</div>';
+  
+  document.getElementById('s-meta').innerHTML=metaHtml;
+  
+  var info='';
+  if(cfg.level==='beginner'){
+    info+='<br><span style="color:#c9a84c;font-size:.7rem;margin-top:4px;display:inline-block">Beginner: aangepaste oefeningen, 3 sets compounds, min. 6 reps, lagere RPE</span>';
+  }else if(cfg.level==='geavanceerd'){
+    info+='<br><span style="color:#c9a84c;font-size:.7rem;margin-top:4px;display:inline-block">Geavanceerd: extra volume bij accessories, hogere RPE (8-8.5)</span>';
+  }
+  if(cfg.goal==='muscle'){
+    info+='<br><span style="color:#c9a84c;font-size:.7rem;margin-top:4px;display:inline-block">Muscle focus: langere rust (60-120s), compound focus, lagere reps voor kracht</span>';
+  }else if(cfg.goal==='fat'){
+    info+='<br><span style="color:#c9a84c;font-size:.7rem;margin-top:4px;display:inline-block">Fat loss: kortere rust (30-60s), hogere reps (10-12), supersets bij accessories</span>';
+  }else if(cfg.goal==='endurance'){
+    info+='<br><span style="color:#c9a84c;font-size:.7rem;margin-top:4px;display:inline-block">Endurance: minimale rust (20-45s), hoge reps (10-15), circuit-style training</span>';
+  }
+  if(info){
+    var infoDiv='<div style="max-width:720px;margin:16px auto 0;padding:12px;background:#141408;border:1px solid #3a3520;border-radius:8px;text-align:center">'+info+'</div>';
+    document.getElementById('s-meta').innerHTML+=infoDiv;
+  }
   document.getElementById('sc').innerHTML=html;
   
   var bnav='';
@@ -616,6 +2504,26 @@ function showBlock(b){
   var btns=document.querySelectorAll('.block-btn'),blks=document.querySelectorAll('.block');
   for(var i=0;i<btns.length;i++){btns[i].classList.remove('act');blks[i].classList.remove('show')}
   btns[b].classList.add('act');blks[b].classList.add('show');
+}
+
+function downloadPDF(){
+  // Temporarily show all blocks for complete PDF
+  var blks=document.querySelectorAll('.block');
+  for(var i=0;i<blks.length;i++)blks[i].classList.add('show');
+  
+  // Set document title for PDF filename
+  var title='12_Weken_'+STYLES[cfg.style].name.replace(/ /g,'_')+'_'+cfg.level+'_'+cfg.days+'dagen';
+  document.title=title;
+  
+  // Trigger print dialog (user can save as PDF)
+  window.print();
+  
+  // Restore block visibility after print
+  setTimeout(function(){
+    for(var i=0;i<blks.length;i++){
+      if(i!==0)blks[i].classList.remove('show');
+    }
+  },100);
 }
 
 init();
