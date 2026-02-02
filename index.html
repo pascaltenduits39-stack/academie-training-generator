@@ -2,151 +2,623 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Academie over Gewicht — Trainingsschema Generator</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Academie over Gewicht — Training Generator</title>
 <style>
-:root{--black:#0a0a0a;--white:#f5f5f0;--gold:#c9a84c;--gold-light:#e2c97e;--gold-dim:rgba(201,168,76,0.15);--gray:#6b6b6b;--gray-light:#a0a0a0;--card-bg:#141414;--border:rgba(201,168,76,0.25)}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--white);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(201,168,76,0.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(201,168,76,0.03) 0%,transparent 50%);pointer-events:none;z-index:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0a0a0a;color:#f0f0f0;min-height:100vh;-webkit-font-smoothing:antialiased}
 
-.screen{display:none;min-height:100vh;position:relative;z-index:1}
-.screen.active{display:flex;flex-direction:column}
-#quiz-screen{justify-content:center;align-items:center;padding:40px 20px}
-.quiz-container{width:100%;max-width:600px}
+/* QUIZ */
+#quiz{max-width:680px;margin:0 auto;padding:40px 24px;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+.quiz-header{text-align:center;margin-bottom:36px}
+.quiz-header h1{font-size:2rem;font-weight:700;color:#fff;letter-spacing:-.5px;margin-bottom:6px}
+.quiz-header h1 span{color:#c9a84c}
+.quiz-header p{color:#777;font-size:.88rem}
+.progress{display:flex;justify-content:center;gap:8px;margin-bottom:28px}
+.dot{width:8px;height:8px;border-radius:50%;background:#2a2a2a;transition:all .3s}
+.dot.active{background:#c9a84c;box-shadow:0 0 6px rgba(201,168,76,.4)}
+.dot.done{background:#c9a84c;opacity:.5}
+.question{margin-bottom:20px}
+.question h2{font-size:1.05rem;color:#fff;margin-bottom:14px;font-weight:600;line-height:1.4}
+.step-label{font-size:.68rem;color:#555;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px}
 
-.quiz-header{text-align:center;margin-bottom:48px}
-.quiz-header .brand{font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
-.quiz-header h1{font-family:'Playfair Display',serif;font-size:42px;font-weight:900;line-height:1.1;color:var(--white)}
-.quiz-header h1 span{color:var(--gold)}
-.quiz-header p{margin-top:12px;color:var(--gray-light);font-size:15px;font-weight:300}
+/* Options */
+.options{display:grid;gap:8px}
+.options.g2{grid-template-columns:1fr 1fr}
+.options.g3{grid-template-columns:1fr 1fr 1fr}
+.option{background:#141414;border:1px solid #252525;border-radius:10px;padding:11px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px;user-select:none}
+.option:hover{border-color:#c9a84c;background:#181810}
+.option.sel{border-color:#c9a84c;background:#1a1a0e}
+.opt-icon{font-size:1.3rem;flex-shrink:0}
+.opt-text{font-size:.85rem;color:#ddd;font-weight:500}
+.opt-sub{font-size:.7rem;color:#555;margin-top:2px}
 
-.progress-track{display:flex;gap:8px;margin-bottom:40px}
-.progress-dot{height:3px;flex:1;background:rgba(255,255,255,0.1);border-radius:2px;transition:background .4s}
-.progress-dot.filled{background:var(--gold)}
+/* Days */
+.days-grid{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.day-btn{width:50px;height:50px;border-radius:10px;border:1px solid #252525;background:#141414;color:#888;font-size:1.2rem;font-weight:600;cursor:pointer;transition:all .15s}
+.day-btn:hover:not(.dis){border-color:#c9a84c;color:#fff;background:#181810}
+.day-btn.sel{border-color:#c9a84c;background:#1a1a0e;color:#c9a84c}
+.day-btn.dis{opacity:.25;cursor:not-allowed}
 
-.question-block{display:none}
-.question-block.active{display:block;animation:fadeUp .4s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.question-label{font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
-.question-text{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:28px}
+/* Warning */
+.warning{background:#141408;border:1px solid #3a3520;border-radius:8px;padding:12px 14px;margin-bottom:16px;display:none}
+.warning.show{display:block}
+.warning p{font-size:.78rem;color:#b8a060;line-height:1.55}
+.warning strong{color:#d4bc7a}
 
-.options{display:flex;flex-direction:column;gap:10px}
-.option{display:flex;align-items:center;gap:16px;padding:16px 20px;border:1px solid var(--border);border-radius:10px;background:var(--card-bg);cursor:pointer;transition:all .25s;user-select:none}
-.option:hover{border-color:var(--gold);background:rgba(201,168,76,0.06)}
-.option.selected{border-color:var(--gold);background:var(--gold-dim);box-shadow:0 0 0 1px var(--gold)}
-.option-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0}
-.option-text{font-size:15px;font-weight:500}
-.option-sub{font-size:12px;color:var(--gray-light);font-weight:300;margin-top:2px}
+/* Generate btn */
+.gen-btn{width:100%;padding:14px;border-radius:10px;border:none;background:linear-gradient(135deg,#c9a84c,#a8893a);color:#000;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.3px;margin-top:8px}
+.gen-btn:hover{transform:translateY(-1px);box-shadow:0 4px 24px rgba(201,168,76,.35)}
+.gen-btn:disabled{opacity:.5;cursor:not-allowed}
 
-.quiz-nav{display:flex;justify-content:space-between;margin-top:36px}
-.btn{padding:14px 32px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;transition:all .25s}
-.btn-back{background:transparent;color:var(--gray-light);border:1px solid rgba(255,255,255,0.1)}
-.btn-back:hover{border-color:var(--gold);color:var(--gold)}
-.btn-next{background:var(--gold);color:var(--black)}
-.btn-next:hover{background:var(--gold-light)}
-.btn-next:disabled{opacity:.3;cursor:not-allowed}
+/* SCHEMA */
+#schema{display:none;min-height:100vh}
+.schema-header{background:#111;border-bottom:1px solid #1e1e1e;padding:28px 20px;text-align:center}
+.schema-header h1{font-size:1.3rem;color:#fff;margin-bottom:4px;font-weight:600}
+.schema-header .meta{font-size:.75rem;color:#666}
+.schema-header .meta span{color:#c9a84c}
 
-#result-screen{padding:0;justify-content:flex-start}
-.result-header{background:var(--black);border-bottom:1px solid var(--border);padding:24px 32px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
-.result-header .brand-small{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
-.result-header .actions{display:flex;gap:12px}
-.btn-pdf{background:var(--gold);color:var(--black);padding:10px 24px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
-.btn-pdf:hover{background:var(--gold-light)}
-.btn-restart{background:transparent;color:var(--gray-light);padding:10px 24px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:1px solid rgba(255,255,255,0.1);transition:all .2s}
-.btn-restart:hover{border-color:var(--gold);color:var(--gold)}
+/* Block nav */
+.block-nav{display:flex;gap:6px;padding:14px 20px;justify-content:center;background:#0d0d0d;position:sticky;top:0;z-index:10;border-bottom:1px solid #1a1a1a}
+.block-btn{padding:5px 16px;border-radius:18px;border:1px solid #2a2a2a;background:transparent;color:#888;font-size:.75rem;cursor:pointer;transition:all .15s;font-weight:500}
+.block-btn:hover{border-color:#c9a84c;color:#c9a84c}
+.block-btn.act{border-color:#c9a84c;background:#c9a84c;color:#000;font-weight:600}
 
-.result-content{max-width:960px;margin:0 auto;padding:48px 24px 80px}
-.result-title-block{text-align:center;margin-bottom:48px;padding-bottom:40px;border-bottom:1px solid var(--border)}
-.result-title-block .brand{font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
-.result-title-block h2{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;margin-bottom:12px}
-.tags{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
-.tag{background:var(--gold-dim);border:1px solid var(--border);color:var(--gold);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500}
+.schema-content{max-width:860px;margin:0 auto;padding:16px 20px 40px}
+.block{display:none}
+.block.show{display:block}
+.wk-header{font-size:.8rem;color:#c9a84c;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:14px 0 8px;border-top:1px solid #1a1a1a;margin-top:12px}
+.wk-header:first-child{border-top:none;margin-top:0}
 
-.section{margin-bottom:48px}
-.section-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:10px}
-.section-title .icon{color:var(--gold)}
-.section-divider{height:2px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:24px;border-radius:1px}
-.overload-text{color:var(--gray-light);font-size:14px;line-height:1.7;font-weight:300;margin-bottom:24px}
+/* Day card */
+.day-card{background:#131313;border:1px solid #1e1e1e;border-radius:8px;margin-bottom:12px;overflow:hidden}
+.day-hdr{background:#181818;padding:8px 14px;display:flex;justify-content:space-between;align-items:center}
+.day-hdr h3{font-size:.82rem;color:#eee;font-weight:600}
+.deload-badge{font-size:.58rem;background:#c9a84c;color:#000;padding:2px 7px;border-radius:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
 
-.blok-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.blok-card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:18px 14px;text-align:center}
-.blok-card .blok-name{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
-.blok-card .blok-weeks{font-size:11px;color:var(--gray);margin-bottom:10px}
-.blok-card .blok-action{font-size:13px;font-weight:500}
+.wu-bar{padding:7px 14px;background:#0f0f0f;border-bottom:1px solid #1a1a1a;font-size:.7rem;color:#666;line-height:1.5}
+.wu-bar strong{color:#c9a84c;font-size:.63rem;text-transform:uppercase;letter-spacing:.4px}
+.cd-bar{padding:6px 14px;background:#0f0f0f;border-top:1px solid #1a1a1a;font-size:.68rem;color:#555}
+.cd-bar strong{color:#c9a84c;font-size:.6rem;text-transform:uppercase}
 
-.schema-block-title{font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.week-group{margin-bottom:8px}
-.week-header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(201,168,76,0.06);border-left:3px solid var(--gold);border-radius:6px;margin:16px 0 12px}
-.week-badge{background:var(--gold-dim);border:1px solid var(--border);padding:3px 10px;border-radius:12px;font-size:11px;color:var(--gold-light)}
+/* Exercise table */
+.ex-tbl{width:100%;border-collapse:collapse}
+.ex-tbl th{text-align:left;font-size:.58rem;color:#4a4a4a;text-transform:uppercase;letter-spacing:.6px;padding:5px 8px;border-bottom:1px solid #1a1a1a;background:#0f0f0f;font-weight:600}
+.ex-row{border-bottom:1px solid #191919}
+.ex-row:last-child{border-bottom:none}
+.ex-row td{padding:7px 8px;vertical-align:top;font-size:.78rem}
+.ex-name{color:#eee;font-weight:500}
+.ex-badge{font-size:.55rem;padding:1px 5px;border-radius:3px;font-weight:600;text-transform:uppercase;letter-spacing:.2px;display:inline-block;margin-left:4px}
+.b-bb{background:#2a1a08;color:#c9a84c}
+.b-db{background:#082a3a;color:#5aabcc}
+.b-kb{background:#1f082a;color:#aa6acc}
+.b-bw{background:#082a10;color:#5acc7a}
+.ex-sr{color:#ccc;font-weight:500}
+.ex-rest{color:#888}
+.ex-rpe{color:#c9a84c;font-weight:600;font-size:.72rem}
+.ex-note{color:#555;font-style:italic;font-size:.67rem;line-height:1.4}
+.w-hint{color:#c9a84c;font-size:.62rem;margin-top:3px;font-style:normal;font-weight:500}
 
-.schema-table{width:100%;border-collapse:collapse;border-radius:10px;overflow:hidden;border:1px solid var(--border);margin-bottom:20px}
-.schema-table th{background:rgba(201,168,76,0.08);color:var(--gold);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:10px 8px;text-align:left;border-bottom:1px solid var(--border)}
-.schema-table td{padding:9px 8px;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.04)}
-.schema-table tr:last-child td{border-bottom:none}
-.schema-table tr:hover td{background:rgba(201,168,76,0.03)}
-.note-cell{color:var(--gray-light);font-size:11px;font-style:italic}
-.eq-badge{display:inline-block;font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:rgba(201,168,76,0.12);color:var(--gold);margin-left:3px}
+/* Log */
+.log-row{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px}
+.log-box{font-size:.58rem;color:#444;background:#0a0a0a;padding:2px 5px;border-radius:2px;border:1px solid #1e1e1e;white-space:nowrap}
 
-.nutrition-box{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:24px;font-size:14px;color:var(--gray-light);line-height:1.8;font-weight:300}
+/* Actions */
+.schema-actions{display:flex;gap:10px;padding:20px;justify-content:center}
+.btn{padding:9px 22px;border-radius:8px;border:1px solid #2a2a2a;background:transparent;color:#888;font-size:.78rem;cursor:pointer;transition:all .15s;font-weight:500}
+.btn:hover{border-color:#c9a84c;color:#c9a84c}
+.btn-gold{background:#c9a84c;color:#000;border-color:#c9a84c;font-weight:600}
+.btn-gold:hover{background:#d4b85c;color:#000}
 
-.loading-overlay{display:none;position:fixed;inset:0;background:rgba(10,10,10,0.85);z-index:100;justify-content:center;align-items:center;flex-direction:column;gap:16px}
-.loading-overlay.active{display:flex}
-.loader{width:40px;height:40px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-overlay p{color:var(--gray-light);font-size:14px;font-weight:300}
-
+/* PRINT */
 @media print{
-  body{background:#fff;color:#111}
-  body::before{display:none}
-  .result-header{display:none}
-  .screen:not(#result-screen){display:none!important}
-  #result-screen{display:flex!important}
-  .result-content{padding:0;max-width:100%}
-  .result-title-block{border-bottom:2px solid #c9a84c;padding-bottom:24px;margin-bottom:32px}
-  .result-title-block .brand{color:#c9a84c}
-  .result-title-block h2{color:#111;font-size:28px}
-  .tag{background:#faf3e0;border-color:#c9a84c;color:#c9a84c}
-  .section-title{color:#111}
-  .section-title .icon{color:#c9a84c}
-  .section-divider{background:linear-gradient(90deg,#c9a84c,transparent)}
-  .overload-text{color:#555}
-  .blok-card{border-color:#ddd;background:#fafafa}
-  .blok-card .blok-name{color:#c9a84c}
-  .schema-block-title{color:#c9a84c}
-  .week-badge{background:#faf3e0;border-color:#c9a84c;color:#b8943e}
-  .schema-table{border-color:#ddd}
-  .schema-table th{background:#faf3e0;color:#c9a84c;border-bottom-color:#ddd}
-  .schema-table td{color:#222;border-bottom-color:#eee}
-  .note-cell{color:#888}
-  .eq-badge{background:#faf3e0;color:#c9a84c}
-  .nutrition-box{background:#fafafa;border-color:#ddd;color:#555}
-  .schema-block{page-break-inside:avoid}
-  .log-section{page-break-before:always}
+  body{background:#fff;color:#000;font-size:11px}
+  #quiz{display:none!important}
+  #schema{display:block!important}
+  .schema-actions,.block-nav{display:none!important}
+  .block{display:block!important;page-break-after:always}
+  .block:last-child{page-break-after:auto}
+  @page{size:A4;margin:18mm}
+
+  .schema-header{background:#fff;border-bottom:2px solid #000;padding:24px 20px;page-break-after:always}
+  .schema-header h1{color:#000;font-size:1.6rem}
+  .schema-header .meta{color:#555}
+  .schema-header .meta span{color:#000;font-weight:600}
+  
+  .schema-content{padding:0;max-width:100%}
+  .wk-header{color:#000;border-top:1px solid #ccc;font-size:.8rem;padding:10px 0 6px;margin-top:10px;font-weight:700}
+  .wk-header:first-child{border:none;margin-top:0}
+
+  .day-card{background:#fff;border:1.5px solid #000;border-radius:0;margin-bottom:12px;page-break-inside:avoid}
+  .day-hdr{background:#f8f8f8;border-bottom:1px solid #ccc}
+  .day-hdr h3{color:#000;font-size:.85rem}
+  .deload-badge{background:#000;color:#fff}
+  
+  .wu-bar{background:#fafafa;border-bottom:1px solid #ddd;color:#444}
+  .wu-bar strong{color:#000}
+  .cd-bar{background:#fafafa;border-top:1px solid #ddd;color:#666}
+  .cd-bar strong{color:#000}
+
+  .ex-tbl th{background:#f0f0f0;color:#666;border-bottom:1.5px solid #ccc;font-size:.6rem}
+  .ex-row{border-bottom:1px solid #ddd}
+  .ex-row td{font-size:.75rem;padding:6px 8px}
+  .ex-name{color:#000}
+  .ex-sr{color:#000}
+  .ex-rest{color:#444}
+  .ex-rpe{color:#000;font-weight:700}
+  .ex-note{color:#666}
+  .w-hint{color:#000;font-weight:600}
+
+  .b-bb{background:#f5f5f5;color:#000;border:1px solid #ccc}
+  .b-db{background:#f5f5f5;color:#000;border:1px solid #ccc}
+  .b-kb{background:#f5f5f5;color:#000;border:1px solid #ccc}
+  .b-bw{background:#f5f5f5;color:#000;border:1px solid #ccc}
+
+  .log-box{background:#fff;border:1px solid #999;color:transparent;min-width:60px;height:18px}
 }
 </style>
 </head>
 <body>
 
-<div id="quiz-screen" class="screen active">
-<div class="quiz-container">
-<div class="quiz-header">
-  <div class="brand">Academie over Gewicht</div>
-  <h1>Vind Jouw <span>Schema</span></h1>
-  <p>Beantwoord 4 vragen — we genereren je schema in seconden.</p>
-</div>
-<div class="progress-track">
-  <div class="progress-dot filled" id="dot-0"></div>
-  <div class="progress-dot" id="dot-1"></div>
-  <div class="progress-dot" id="dot-2"></div>
-  <div class="progress-dot" id="dot-3"></div>
+<div id="quiz">
+  <div class="quiz-header">
+    <h1>Training <span>Generator</span></h1>
+    <p>Academie over Gewicht</p>
+  </div>
+  <div class="progress" id="prog"></div>
+  <div id="qc"></div>
+  <button class="gen-btn" id="gen-btn" onclick="generate()" style="display:none">Genereer Schema</button>
 </div>
 
-<div class="question-block active" id="q0">
-  <div class="question-label" id="q0-label">Vraag 1 van 4</div>
-  <div class="question-text">Hoeveel keer per week kun je trainen?</div>
-  <div class="options">
-    <div class="option" data-q="0" data-val="2"><div class="option-icon">📅</div><div><div class="option-text">2x per week</div><div class="option-sub">Ideaal voor herstel & basis opbouw</div></div></div>
-    <div class="option" data-q="0" data-val="3"><div class="option-icon">📅</div><div><div class="option-text">3x per week</div><div class="option-sub">De meest populaire frequentie</div></div></div>
-    <div class="option" data-q="0" data-val="4"><div class="option-icon">📅</div><div><div class="option-text">4x per week</div><div class="option-sub
+<div id="schema">
+  <div class="schema-header">
+    <h1 id="s-title"></h1>
+    <div class="meta" id="s-meta"></div>
+  </div>
+  <div class="block-nav" id="bnav"></div>
+  <div class="schema-content" id="sc"></div>
+  <div class="schema-actions">
+    <button class="btn btn-gold" onclick="window.print()">📄 Print Schema</button>
+    <button class="btn" onclick="location.reload()">🔄 Nieuwe Schema</button>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG ───
+var cfg={style:null,days:null,level:'gevorderd',goal:'all'};
+var qIdx=0,warn='';
+
+// ─── STYLES ───
+var STYLES={
+  ppl:{name:'Push Pull Legs',min:3,max:6},
+  ul:{name:'Upper/Lower Split',min:3,max:4},
+  bbb:{name:'BBB (Buik, Billen, Benen)',min:3,max:3},
+  bro:{name:'Bro Split',min:5,max:5},
+  fb:{name:'Full Body',min:2,max:4}
+};
+
+// ─── POOLS ───
+var POOLS={
+  ppl3:{
+    Push:[
+      ['Bankdrukken','bb',4,6,'2-3 min',8,'Schouders vast, ademhaling uit bij omlaag'],
+      ['Overhead Press','bb',3,6,'90s',7,'Core vast, niet achterover buigen'],
+      ['Incline Dumbbell Press','db',3,10,'75s',7,'Bank op 30-45 graden'],
+      ['Tricep Dips','bw',3,10,'60s',7,'Ellebogen achteruit'],
+      ['Lateral Raise','db',3,12,'60s',6,'Niet hoger dan schouders'],
+      ['Overhead Tricep Extension','db',2,12,'45s',6,'Ellebogen vast']
+    ],
+    Pull:[
+      ['Deadlift','bb',4,5,'2-3 min',8,'Rug recht, gewicht langs benen'],
+      ['Pull-ups','bw',3,6,'90s',7,'Volledig uit stretchen'],
+      ['Bent-over Row','bb',3,8,'75s',7,'Ellebogen langs de romp'],
+      ['Facepull','bw',3,15,'45s',6,'Ellebogen hoog'],
+      ['Bicep Curl','db',3,10,'60s',6,'Langzaam terug zakken'],
+      ['Rear Delt Fly','db',2,12,'45s',6,'Armen recht']
+    ],
+    Legs:[
+      ['Barbell Squat','bb',4,6,'2-3 min',8,'Rug recht, ademhaling uit bij omlaag'],
+      ['Romanian Deadlift','bb',3,8,'90s',7,'Benen licht gebogen'],
+      ['Leg Press','bw',3,10,'75s',7,'Voeten midden-hoog'],
+      ['Walking Lunges','db',3,'8/been','60s',7,'Knie achter teennen'],
+      ['Leg Curl','bw',3,10,'60s',6,'Langzaam terug'],
+      ['Calf Raises','bw',3,15,'45s',6,'Heel volledig omhoog'],
+      ['Plank','bw',2,'45s','30s',5,'Lichaam als 1 lijn']
+    ]
+  },
+  ppl6:{
+    'Push 1':[
+      ['Bankdrukken','bb',4,5,'2-3 min',8.5,'Schouders vast'],
+      ['Overhead Press','bb',3,5,'90s',8,'Core vast'],
+      ['Incline Dumbbell Press','db',3,7,'75s',7.5,'Bank op 30-45 graden'],
+      ['Tricep Dips','bw',3,8,'60s',7,'Ellebogen achteruit']
+    ],
+    'Pull 1':[
+      ['Deadlift','bb',4,5,'2-3 min',8.5,'Rug recht'],
+      ['Pull-ups','bw',3,5,'90s',8,'Volledig uit stretchen'],
+      ['Bent-over Row','bb',3,6,'75s',7.5,'Ellebogen langs romp'],
+      ['Facepull','bw',3,12,'45s',6,'Ellebogen hoog']
+    ],
+    'Legs 1':[
+      ['Barbell Squat','bb',4,5,'2-3 min',8.5,'Rug recht'],
+      ['Romanian Deadlift','bb',3,6,'90s',8,'Benen licht gebogen'],
+      ['Leg Press','bw',3,8,'75s',7.5,'Voeten midden-hoog'],
+      ['Leg Curl','bw',3,10,'60s',7,'Langzaam terug']
+    ],
+    'Push 2':[
+      ['Incline Dumbbell Press','db',4,10,'75s',7,'Bank op 30-45 graden'],
+      ['DB Shoulder Press','db',3,10,'60s',7,'Niet achterover buigen'],
+      ['Lateral Raise','db',3,12,'45s',6,'Niet hoger dan schouders'],
+      ['Tricep Pushdown','bw',3,12,'45s',6,'Ellebogen vast']
+    ],
+    'Pull 2':[
+      ['Bent-over Row','db',4,8,'75s',7,'Ellebogen langs romp'],
+      ['Seated Cable Row','bw',3,10,'60s',7,'Ellebogen langs romp'],
+      ['Bicep Curl','db',3,12,'60s',6,'Langzaam terug'],
+      ['Hammer Curl','db',3,10,'45s',6,'Neutrale grip']
+    ],
+    'Legs 2':[
+      ['Bulgarian Split Squat','db',3,'10/been','75s',7,'Achterbeen op bank'],
+      ['Hip Thrust','db',3,12,'60s',7,'Knip bovenaan'],
+      ['Step-ups','db',3,'10/been','60s',7,'Voet volledig op bank'],
+      ['Leg Extension','bw',3,12,'45s',6,'Langzaam terug'],
+      ['Calf Raises','bw',3,15,'45s',6,'Heel volledig omhoog']
+    ]
+  },
+  ul3:{
+    Upper:[
+      ['Bankdrukken','bb',4,6,'2-3 min',8,'Schouders vast'],
+      ['Pull-ups','bw',3,6,'90s',7,'Volledig uit stretchen'],
+      ['Overhead Press','bb',3,6,'75s',7,'Core vast'],
+      ['Incline Dumbbell Press','db',3,10,'60s',7,'Bank op 30-45 graden'],
+      ['Lateral Raise','db',3,12,'45s',6,'Niet hoger dan schouders'],
+      ['Facepull','bw',2,15,'45s',6,'Ellebogen hoog']
+    ],
+    Lower:[
+      ['Barbell Squat','bb',4,6,'2-3 min',8,'Rug recht'],
+      ['Romanian Deadlift','bb',3,8,'90s',7,'Benen licht gebogen'],
+      ['Walking Lunges','db',3,'8/been','60s',7,'Knie achter teennen'],
+      ['Leg Press','bw',3,10,'75s',7,'Voeten midden-hoog'],
+      ['Leg Curl','bw',3,10,'60s',6,'Langzaam terug'],
+      ['Calf Raises','bw',3,15,'45s',6,'Heel volledig omhoog'],
+      ['Plank','bw',2,'45s','30s',5,'Core vast']
+    ],
+    'Full Body':[
+      ['Barbell Squat','bb',3,8,'90s',7,'Rug recht'],
+      ['Bankdrukken','bb',3,8,'75s',7,'Schouders vast'],
+      ['Bent-over Row','db',3,10,'60s',7,'Ellebogen langs romp'],
+      ['Romanian Deadlift','db',3,8,'60s',7,'Benen licht gebogen'],
+      ['Overhead Press','db',3,8,'45s',6,'Core vast'],
+      ['Walking Lunges','db',3,'8/been','45s',6,'Gecontroleerd'],
+      ['Plank','bw',2,'45s','30s',5,'Core vast']
+    ]
+  },
+  ul4:{
+    'Upper 1':[
+      ['Bankdrukken','bb',4,6,'2-3 min',8,'Schouders vast'],
+      ['Pull-ups','bw',3,6,'90s',7,'Volledig uit stretchen'],
+      ['Overhead Press','bb',3,6,'75s',7,'Core vast'],
+      ['Incline Dumbbell Press','db',3,10,'60s',7,'Bank op 30-45 graden'],
+      ['Lateral Raise','db',3,12,'45s',6,'Niet hoger dan schouders'],
+      ['Facepull','bw',2,15,'45s',6,'Ellebogen hoog']
+    ],
+    'Lower 1':[
+      ['Barbell Squat','bb',4,6,'2-3 min',8,'Rug recht'],
+      ['Romanian Deadlift','bb',3,8,'90s',7,'Benen licht gebogen'],
+      ['Walking Lunges','db',3,'8/been','60s',7,'Knie achter teennen'],
+      ['Leg Press','bw',3,10,'75s',7,'Voeten midden-hoog'],
+      ['Leg Curl','bw',3,10,'60s',6,'Langzaam terug'],
+      ['Calf Raises','bw',3,15,'45s',6,'Heel volledig omhoog'],
+      ['Plank','bw',2,'45s','30s',5,'Core vast']
+    ],
+    'Upper 2':[
+      ['Bent-over Row','bb',4,6,'2-3 min',8,'Ellebogen langs romp'],
+      ['Incline Dumbbell Press','db',3,8,'75s',7,'Bank op 30-45 graden'],
+      ['DB Shoulder Press','db',3,8,'60s',7,'Niet achterover buigen'],
+      ['Seated Cable Row','bw',3,10,'60s',7,'Ellebogen langs romp'],
+      ['Bicep Curl','db',3,10,'45s',6,'Langzaam terug'],
+      ['Rear Delt Fly','db',2,12,'45s',6,'Armen recht']
+    ],
+    'Lower 2':[
+      ['Deadlift','bb',4,5,'2-3 min',8,'Rug recht'],
+      ['Bulgarian Split Squat','db',3,'8/been','75s',7,'Achterbeen op bank'],
+      ['Hip Thrust','db',3,12,'60s',7,'Knip bovenaan'],
+      ['Step-ups','db',3,'10/been','60s',7,'Voet volledig op bank'],
+      ['Leg Extension','bw',3,12,'45s',6,'Langzaam terug'],
+      ['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Hip stabilisatie']
+    ]
+  },
+  bbb:{
+    'Buik & Billen':[
+      ['Hip Thrust','bb',4,8,'90s',7,'Knip bovenaan'],
+      ['Glute Bridge','db',3,12,'60s',7,'Schouders op bank'],
+      ['Bankdrukken','bb',3,8,'75s',7,'Bovenlichaam onderhouden'],
+      ['Bent-over Row','db',3,10,'60s',7,'Ellebogen langs romp'],
+      ['Single Leg RDL','db',3,'8/been','60s',6,'Balans op 1 ben'],
+      ['Bench Step-ups','db',3,'10/been','45s',6,'Voet volledig op bank'],
+      ['Plank','bw',2,'45s','30s',5,'Core vast']
+    ],
+    'Billen & Benen':[
+      ['Barbell Squat','bb',4,6,'2-3 min',8,'Rug recht'],
+      ['Romanian Deadlift','bb',3,8,'90s',7,'Benen licht gebogen'],
+      ['Bulgarian Split Squat','db',3,'8/been','75s',7,'Achterbeen op bank'],
+      ['Leg Press','bw',3,10,'60s',7,'Voeten midden-hoog'],
+      ['Leg Curl','bw',3,10,'45s',6,'Langzaam terug'],
+      ['Calf Raises','bw',3,15,'45s',6,'Heel volledig omhoog'],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Rug plat']
+    ],
+    'Benen & Buik':[
+      ['Deadlift','bb',4,5,'2-3 min',8,'Rug recht'],
+      ['Walking Lunges','db',3,'10/been','75s',7,'Knie achter teennen'],
+      ['Hip Thrust','db',3,12,'60s',7,'Knip bovenaan'],
+      ['Step-ups','db',3,'10/been','60s',6,'Voet volledig op bank'],
+      ['Overhead Press','db',3,8,'45s',6,'Core vast'],
+      ['Lateral Raise','db',2,12,'45s',6,'Niet hoger dan schouders'],
+      ['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Lichaam recht']
+    ]
+  },
+  bro:{
+    Chest:[
+      ['Bankdrukken','bb',4,6,'2-3 min',8,'Schouders vast'],
+      ['Incline Dumbbell Press','db',3,10,'75s',7,'Bank op 30-45 graden'],
+      ['Decline Dumbbell Press','db',3,10,'60s',7,'Bank omlaag 15-20 graden'],
+      ['Cable Chest Fly','bw',3,12,'45s',6,'Armen licht gebogen'],
+      ['Tricep Dips','bw',3,10,'45s',6,'Ellebogen achteruit'],
+      ['Plank','bw',2,'45s','30s',5,'Core vast']
+    ],
+    Back:[
+      ['Deadlift','bb',4,5,'2-3 min',8,'Rug recht'],
+      ['Pull-ups','bw',3,6,'90s',7,'Volledig uit stretchen'],
+      ['Bent-over Row','bb',3,8,'75s',7,'Ellebogen langs romp'],
+      ['Lat Pulldown','bw',3,10,'60s',6,'Ellebogen omlaag'],
+      ['Facepull','bw',3,15,'45s',6,'Ellebogen hoog'],
+      ['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Lichaam recht']
+    ],
+    Shoulders:[
+      ['Overhead Press','bb',4,5,'2 min',8,'Core vast'],
+      ['DB Shoulder Press','db',3,10,'60s',7,'Niet achterover buigen'],
+      ['Lateral Raise','db',4,12,'45s',6,'Niet hoger dan schouders'],
+      ['Front Raise','db',3,10,'45s',6,'Armen recht vooruit'],
+      ['Rear Delt Fly','db',3,12,'45s',6,'Armen recht'],
+      ['Facepull','bw',2,15,'45s',6,'Schouder gezondheid']
+    ],
+    Arms:[
+      ['Bicep Curl','db',4,10,'60s',7,'Langzaam terug'],
+      ['Hammer Curl','db',3,10,'45s',6,'Neutrale grip'],
+      ['Tricep Dips','bw',4,10,'60s',7,'Ellebogen achteruit'],
+      ['Overhead Tricep Extension','db',3,12,'45s',6,'Ellebogen vast'],
+      ['Tricep Pushdown','bw',3,12,'45s',6,'Ellebogen vast'],
+      ['Preacher Curl','bw',2,10,'45s',6,'Langzaam terug']
+    ],
+    Legs:[
+      ['Barbell Squat','bb',4,6,'2-3 min',8,'Rug recht'],
+      ['Romanian Deadlift','bb',3,8,'90s',7,'Benen licht gebogen'],
+      ['Leg Press','bw',3,10,'75s',7,'Voeten midden-hoog'],
+      ['Walking Lunges','db',3,'8/been','60s',7,'Knie achter teennen'],
+      ['Leg Curl','bw',3,10,'60s',6,'Langzaam terug'],
+      ['Calf Raises','bw',3,15,'45s',6,'Heel volledig omhoog'],
+      ['Plank','bw',2,'45s','30s',5,'Lichaam als 1 lijn']
+    ]
+  },
+  fb2:{
+    'Full Body A':[
+      ['Barbell Squat','bb',4,6,'2-3 min',8,'Rug recht'],
+      ['Bankdrukken','bb',3,8,'75s',7,'Schouders vast'],
+      ['Bent-over Row','db',3,10,'60s',7,'Ellebogen langs romp'],
+      ['Romanian Deadlift','db',3,8,'60s',7,'Benen licht gebogen'],
+      ['Overhead Press','db',3,8,'45s',6,'Core vast'],
+      ['Walking Lunges','db',3,'8/been','45s',6,'Gecontroleerd'],
+      ['Plank','bw',2,'45s','30s',5,'Core vast']
+    ],
+    'Full Body B':[
+      ['Deadlift','bb',4,5,'2-3 min',8,'Rug recht'],
+      ['Incline Dumbbell Press','db',3,10,'75s',7,'Bank op 30-45 graden'],
+      ['Pull-ups','bw',3,6,'75s',7,'Volledig uit stretchen'],
+      ['Hip Thrust','db',3,12,'60s',7,'Knip bovenaan'],
+      ['Bulgarian Split Squat','db',3,'8/been','60s',6,'Achterbeen op bank'],
+      ['Lateral Raise','db',3,12,'45s',6,'Niet hoger dan schouders'],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Rug plat']
+    ]
+  },
+  fb3:{
+    'Full Body A':[
+      ['Barbell Squat','bb',4,6,'2-3 min',8,'Rug recht'],
+      ['Bankdrukken','bb',3,8,'75s',7,'Schouders vast'],
+      ['Bent-over Row','db',3,10,'60s',7,'Ellebogen langs romp'],
+      ['Romanian Deadlift','db',3,8,'60s',7,'Benen licht gebogen'],
+      ['Overhead Press','db',3,8,'45s',6,'Core vast'],
+      ['Walking Lunges','db',3,'8/been','45s',6,'Gecontroleerd'],
+      ['Plank','bw',2,'45s','30s',5,'Core vast']
+    ],
+    'Full Body B':[
+      ['Deadlift','bb',4,5,'2-3 min',8,'Rug recht'],
+      ['Incline Dumbbell Press','db',3,10,'75s',7,'Bank op 30-45 graden'],
+      ['Pull-ups','bw',3,6,'75s',7,'Volledig uit stretchen'],
+      ['Hip Thrust','db',3,12,'60s',7,'Knip bovenaan'],
+      ['Bulgarian Split Squat','db',3,'8/been','60s',6,'Achterbeen op bank'],
+      ['Lateral Raise','db',3,12,'45s',6,'Niet hoger dan schouders'],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Rug plat']
+    ],
+    'Full Body C':[
+      ['Hip Thrust','bb',4,8,'90s',7,'Knip bovenaan'],
+      ['Incline Dumbbell Press','db',3,8,'75s',7,'Bank op 30-45 graden'],
+      ['Seated Cable Row','bw',3,10,'60s',7,'Ellebogen langs romp'],
+      ['Bulgarian Split Squat','db',3,'10/been','60s',7,'Achterbeen op bank'],
+      ['Tricep Dips','bw',3,10,'45s',6,'Ellebogen achteruit'],
+      ['Calf Raises','bw',3,15,'45s',6,'Heel volledig omhoog'],
+      ['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Hip stabilisatie']
+    ]
+  },
+  fb4:{
+    'Full Body A':[
+      ['Barbell Squat','bb',4,6,'2-3 min',8,'Rug recht'],
+      ['Bankdrukken','bb',3,8,'75s',7,'Schouders vast'],
+      ['Bent-over Row','db',3,10,'60s',7,'Ellebogen langs romp'],
+      ['Romanian Deadlift','db',3,8,'60s',7,'Benen licht gebogen'],
+      ['Overhead Press','db',3,8,'45s',6,'Core vast'],
+      ['Plank','bw',2,'45s','30s',5,'Core vast']
+    ],
+    'Full Body B':[
+      ['Deadlift','bb',4,5,'2-3 min',8,'Rug recht'],
+      ['Incline Dumbbell Press','db',3,10,'75s',7,'Bank op 30-45 graden'],
+      ['Pull-ups','bw',3,6,'75s',7,'Volledig uit stretchen'],
+      ['Hip Thrust','db',3,12,'60s',7,'Knip bovenaan'],
+      ['Walking Lunges','db',3,'8/been','60s',6,'Gecontroleerd'],
+      ['Dead Bug','bw',2,'10/zijde','30s',5,'Rug plat']
+    ],
+    'Full Body C':[
+      ['Hip Thrust','bb',4,8,'90s',7,'Knip bovenaan'],
+      ['Overhead Press','db',3,8,'60s',7,'Core vast'],
+      ['Seated Cable Row','bw',3,10,'60s',7,'Ellebogen langs romp'],
+      ['Bulgarian Split Squat','db',3,'10/been','60s',7,'Achterbeen op bank'],
+      ['Lateral Raise','db',3,12,'45s',6,'Niet hoger dan schouders'],
+      ['Copenhagen Plank','bw',2,'20s/zijde','30s',5,'Hip stabilisatie']
+    ],
+    'Full Body D':[
+      ['Barbell Squat','bb',3,8,'90s',7,'Rug recht'],
+      ['Bent-over Row','bb',3,8,'75s',7,'Ellebogen langs romp'],
+      ['Romanian Deadlift','db',3,8,'60s',7,'Benen licht gebogen'],
+      ['Incline Dumbbell Press','db',3,10,'60s',6,'Bank op 30-45 graden'],
+      ['Calf Raises','bw',3,15,'45s',6,'Heel volledig omhoog'],
+      ['Plank','bw',2,'45s','30s',5,'Core vast']
+    ]
+  }
+};
+
+// ─── QUIZ ───
+function init(){qIdx=0;warn='';renderQ()}
+
+function renderQ(){
+  var qs=[qStyle,qDays,qLevel,qGoal];
+  var h='',dots='';
+  for(var i=0;i<4;i++)dots+='<div class="dot '+(i<qIdx?'done':(i===qIdx?'active':''))+'"></div>';
+  document.getElementById('prog').innerHTML=dots;
+  h+='<div class="step-label">Stap '+(qIdx+1)+' van 4</div>';
+  if(warn)h+='<div class="warning show"><p>'+warn+'</p></div>';
+  h+=qs[qIdx]();
+  document.getElementById('qc').innerHTML=h;
+  document.getElementById('gen-btn').style.display=(qIdx===3&&cfg.style&&cfg.days&&cfg.level&&cfg.goal)?'block':'none';
+}
+
+function qStyle(){
+  var list=['ppl','ul','bbb','bro','fb'];
+  var icons={ppl:'💪',ul:'⚖️',bbb:'🍑',bro:'🏋️',fb:'🌐'};
+  var subs={ppl:'Duwen / Trekken / Benen',ul:'Bovenlichaam & Onderlichaam',bbb:'Focus op billen, benen en core',bro:'Elke dag 1 spiergroep',fb:'Alle spiergroepen elke sessie'};
+  var h='<div class="question"><h2>Welke trainingsstijl wil je volgen?</h2></div><div class="options">';
+  for(var i=0;i<list.length;i++){
+    var s=list[i],sel=cfg.style===s?' sel':'';
+    h+='<div class="option'+sel+'" onclick="selStyle(\''+s+'\')"><span class="opt-icon">'+icons[s]+'</span><div><div class="opt-text">'+STYLES[s].name+'</div><div class="opt-sub">'+subs[s]+'</div></div></div>';
+  }
+  return h+'</div>';
+}
+
+function selStyle(s){cfg.style=s;warn='';qIdx=1;renderQ()}
+
+function qDays(){
+  var st=STYLES[cfg.style],h='<div class="question"><h2>Hoeveel dagen per week wil je trainen?</h2></div><div class="days-grid">';
+  for(var d=1;d<=6;d++){
+    var dis=d<st.min||d>st.max?' dis':'',sel=cfg.days===d?' sel':'';
+    h+='<div class="day-btn'+dis+sel+'" onclick="selDays('+d+')">'+d+'</div>';
+  }
+  return h+'</div>';
+}
+
+function selDays(d){
+  var st=STYLES[cfg.style];
+  if(d<st.min||d>st.max)return;
+  cfg.days=d;warn='';
+  // Auto-convert warnings
+  if(cfg.style==='ppl'&&(d===1||d===2)){
+    warn='<strong>Let op:</strong> PPL vereist minimaal 3 dagen. We zetten je automatisch om naar Full Body ('+d+' dagen).';
+    cfg.style='fb';
+  }
+  else if(cfg.style==='fb'&&d>=5){
+    warn='<strong>Let op:</strong> Full Body is niet optimaal voor 5+ dagen. We adviseren Push Pull Legs ('+d+' dagen).';
+    cfg.style='ppl';
+  }
+  qIdx=2;renderQ();
+}
+
+function qLevel(){
+  var h='<div class="question"><h2>Wat is jouw trainingsniveau?</h2></div><div class="options g3">';
+  var lvls=[['beginner','🌱','Nieuw met training'],['gevorderd','⚡','6+ maanden ervaring'],['geavanceerd','🔥','2+ jaar ervaring']];
+  for(var i=0;i<lvls.length;i++){
+    var l=lvls[i],sel=cfg.level===l[0]?' sel':'';
+    h+='<div class="option'+sel+'" onclick="selLevel(\''+l[0]+'\')"><span class="opt-icon">'+l[1]+'</span><div><div class="opt-text">'+l[0].charAt(0).toUpperCase()+l[0].slice(1)+'</div><div class="opt-sub">'+l[2]+'</div></div></div>';
+  }
+  return h+'</div>';
+}
+
+function selLevel(l){cfg.level=l;warn='';qIdx=3;renderQ()}
+
+function qGoal(){
+  var h='<div class="question"><h2>Wat is jouw primaire doel?</h2></div><div class="options g2">';
+  var goals=[['muscle','💪','Spieren opbouwen'],['fat','🔥','Vet verbranden'],['endurance','⚡','Uithoudingsvermogen'],['all','🌟','Algemene fitness']];
+  for(var i=0;i<goals.length;i++){
+    var g=goals[i],sel=cfg.goal===g[0]?' sel':'';
+    h+='<div class="option'+sel+'" onclick="selGoal(\''+g[0]+'\')"><span class="opt-icon">'+g[1]+'</span><div><div class="opt-text">'+g[2]+'</div></div></div>';
+  }
+  return h+'</div>';
+}
+
+function selGoal(g){cfg.goal=g;warn='';renderQ()}
+
+// ─── GENERATE ───
+function generate(){
+  var key=cfg.style+(cfg.style==='ppl'?(cfg.days===6?'6':cfg.days>=3?'3':'3'):cfg.style==='ul'?(cfg.days===4?'4':'3'):cfg.style==='fb'?cfg.days:'');
+  var pool=POOLS[key];
+  if(!pool){alert('Pool niet gevonden: '+key);return}
+  
+  var html='',days=Object.keys(pool),totDays=days.length,wksPerBlock=3,totBlocks=4;
+  
+  for(var b=0;b<totBlocks;b++){
+    html+='<div class="block'+(b===0?' show':'')+'" id="b'+b+'">';
+    for(var w=0;w<wksPerBlock;w++){
+      var wkNum=b*wksPerBlock+w+1,isDeload=wkNum===12;
+      html+='<div class="wk-header">Week '+wkNum+(isDeload?' — Deload':'')+'</div>';
+      for(var di=0;di<totDays;di++){
+        var dayName=days[di],exs=pool[dayName];
+        html+='<div class="day-card"><div class="day-hdr"><h3>'+dayName+'</h3>'+(isDeload?'<span class="deload-badge">Deload</span>':'')+'</div>';
+        html+='<div class="wu-bar"><strong>Warming-up:</strong> 5 min cardio + dynamische stretching (schouder rotaties, hip circles, squats)</div>';
+        html+='<table class="ex-tbl"><thead><tr><th>Oefening</th><th>Sets</th><th>Reps</th><th>Rust</th><th>RPE</th><th>Notitie</th><th>Log</th></tr></thead><tbody>';
+        for(var ei=0;ei<exs.length;ei++){
+          var ex=exs[ei],name=ex[0],eq=ex[1],s=ex[2],r=ex[3],rest=ex[4],rpe=ex[5],note=ex[6];
+          var sBadge='<span class="ex-badge b-'+eq+'">'+eq.toUpperCase()+'</span>';
+          var sr=s,rr=r,hint='';
+          if(isDeload){sr=Math.ceil(s*0.6);rr=typeof r==='number'?Math.ceil(r*0.8):r;hint='<div class="w-hint">Deload: -40% sets, -20% reps</div>'}
+          else if(wkNum%3===2){rr=typeof r==='number'?r+2:r;hint='<div class="w-hint">Week '+wkNum+': +2 reps bij zelfde gewicht</div>'}
+          else if(wkNum%3===0&&wkNum!==12){hint='<div class="w-hint">Week '+wkNum+': Verhoog gewicht ~5%, reset naar basis reps</div>'}
+          var logs='<div class="log-row">';
+          for(var si=0;si<sr;si++)logs+='<span class="log-box">Set '+(si+1)+'</span>';
+          logs+='</div>';
+          html+='<tr class="ex-row"><td><div class="ex-name">'+name+sBadge+'</div></td><td class="ex-sr">'+sr+'</td><td class="ex-sr">'+rr+'</td><td class="ex-rest">'+rest+'</td><td class="ex-rpe">'+rpe+'</td><td><div class="ex-note">'+note+'</div>'+hint+'</td><td>'+logs+'</td></tr>';
+        }
+        html+='</tbody></table>';
+        html+='<div class="cd-bar"><strong>Cool-down:</strong> 5 min rustige cardio (wandelen/roeien) + statische stretching</div></div>';
+      }
+    }
+    html+='</div>';
+  }
+  
+  document.getElementById('s-title').textContent='12 Weken '+STYLES[cfg.style].name+' Programma';
+  document.getElementById('s-meta').innerHTML='<span>'+cfg.days+' dagen/week</span> • <span>'+cfg.level.charAt(0).toUpperCase()+cfg.level.slice(1)+'</span> • <span>'+cfg.goal.charAt(0).toUpperCase()+cfg.goal.slice(1)+'</span>';
+  document.getElementById('sc').innerHTML=html;
+  
+  var bnav='';
+  for(var b=0;b<totBlocks;b++)bnav+='<button class="block-btn'+(b===0?' act':'')+'" onclick="showBlock('+b+')">Blok '+(b+1)+'</button>';
+  document.getElementById('bnav').innerHTML=bnav;
+  
+  document.getElementById('quiz').style.display='none';
+  document.getElementById('schema').style.display='block';
+}
+
+function showBlock(b){
+  var btns=document.querySelectorAll('.block-btn'),blks=document.querySelectorAll('.block');
+  for(var i=0;i<btns.length;i++){btns[i].classList.remove('act');blks[i].classList.remove('show')}
+  btns[b].classList.add('act');blks[b].classList.add('show');
+}
+
+init();
+</script>
+</body>
+</html>
